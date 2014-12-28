@@ -2,6 +2,7 @@ package com.itranswarp.jsonstream;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -200,6 +201,28 @@ public class JsonStreamTest {
         Object[] expecteds = {"TEST", true, 1L, false, 2.5, null, "END"};
         for (String s : tests) {
             assertArrayEquals(expecteds, ((List<?>) prepareJsonStream(s).parse()).toArray());
+        }
+    }
+
+    @Test
+    public void testParseNonEmptyObjectOk() throws Exception {
+        String[] tests = {
+                "{\"TEST\":true,\" num \":1,\"B\":false,\"--float--\":2.5,\"null\":null,\"\":\"END\"}",
+                "{ \"TEST\": true,\" num \": 1, \"B\" : false ,\"--float--\"\t: 2.5 , \"null\"  : null, \"\":\t \t\"END\" }",
+                " { \"TEST\": \ntrue, \" num \"\r:\n1,\t\"B\"\n:false , \"--float--\": 2.5 ,\n\"null\"\n:null, \"\"\r:\"END\" } ",
+                "\n{\n  \"TEST\": true,\t\" num \":\t 1,\"B\"\n:\n false ,\n\n\"--float--\"\n:\n2.5 ,\"null\"\n:\nnull, \"\"\n:\n\"END\"\r}\n\t",
+                "\r{\t\"TEST\":\n \n \r true,    \n\" num \":1,  \"B\":  false \n, \"--float--\"\r \r:\r2.5 ,\t\"null\" :null ,\n\"\": \"END\"\n }\t"
+        };
+        Object[] expecteds = {"TEST", " num ", "B", "--float--", "null", ""};
+        Arrays.sort(expecteds);
+        for (String s : tests) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> map = (Map<String, Object>) prepareJsonStream(s).parse();
+            Object[] keys = map.keySet().toArray();
+            Arrays.sort(keys);
+            assertArrayEquals(expecteds, keys);
+            // check key-value:
+            assertTrue((Boolean) map.get("TEST"));
         }
     }
 

@@ -200,7 +200,7 @@ public class JsonStream {
                     status = STATUS_READ_END_DOCUMENT;
                     continue;
                 }
-                if (status == STATUS_READ_OBJECT_KEY) {
+                if (hasStatus(STATUS_READ_OBJECT_KEY)) {
                     stack.push(StackValue.newJsonObjectKey(str));
                     status = STATUS_READ_COLON;
                     continue;

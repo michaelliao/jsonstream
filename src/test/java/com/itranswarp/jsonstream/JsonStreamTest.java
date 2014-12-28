@@ -2,16 +2,15 @@ package com.itranswarp.jsonstream;
 
 import static org.junit.Assert.*;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class JsonStreamTest {
@@ -19,7 +18,7 @@ public class JsonStreamTest {
     static final double DELTA = 0.00000001;
 
     JsonStream prepareJsonStream(String s) {
-        return new JsonStream(s);
+        return new JsonStream(new StringReader(s), null, null);
     }
 
     String prepareStandardJson(Object obj) {
@@ -325,5 +324,26 @@ public class JsonStreamTest {
         String src = prepareStandardJson(list);
         List<Object> parsed = (List<Object>) prepareJsonStream(src).parse();
         assertEquals(src, prepareStandardJson(parsed));
+    }
+
+    @Test()
+    public void testParseWithInvalidJson() throws Exception {
+        String[] tests = {
+                " [ { \"A\":    [ true, true ],  \"B\":  [ null, null, [ \"should be ] but }\" ] ], \"C\":   {}  }  }  ",
+                " { \"A\": [  \"missing end }\"   ]  ",
+                " { \"A\": [  \"should be } but ]\"   ] ] ",
+                " { \"A\": [ \"has extra }\", []] } }   "
+        };
+        for (String s : tests) {
+            try {
+                prepareJsonStream(s).parse();
+                fail("Not caught JsonParseException when parse: " + s);
+            }
+            catch (JsonParseException e) {
+                // ok, and log error message:
+                System.out.println("Parse: " + s);
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
     }
 }

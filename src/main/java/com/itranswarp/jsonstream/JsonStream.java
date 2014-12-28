@@ -1,111 +1,29 @@
 package com.itranswarp.jsonstream;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class JsonStream {
 
     final TokenReader reader;
 
-	public JsonStream(Reader reader) {
+    final JsonObjectFactory jsonObjectFactory;
+    final JsonArrayFactory jsonArrayFactory;
+
+	public JsonStream(Reader reader, JsonObjectFactory jsonObjectFactory, JsonArrayFactory jsonArrayFactory) {
 		this.reader = new TokenReader(new CharReader(reader));
+        this.jsonObjectFactory = jsonObjectFactory != null ? jsonObjectFactory : () -> {
+            return new HashMap<String, Object>();
+        };
+        this.jsonArrayFactory = jsonArrayFactory != null ? jsonArrayFactory : () -> {
+            return new ArrayList<Object>();
+        };
 	}
 
-	public JsonStream(String str) {
-		this(new StringReader(str));
-	}
-
-	public JsonStream(InputStream input) throws IOException {
-		this(new InputStreamReader(input, "UTF-8"));
-	}
-
-	<T> T newInstance(Class<T> clazz) {
-		try {
-			return clazz.newInstance();
-		} catch (InstantiationException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-    Stack stack;
-    boolean isSingleValue;
-    Token lastToken;
-    int status;
-
-    /**
-     * Should read EOF for next token.
-     */
-    static final int STATUS_READ_END_DOCUMENT   = 0x0002;
-
-    /**
-     * Should read "{" for next token.
-     */
-    static final int STATUS_READ_BEGIN_OBJECT   = 0x0004;
-
-    /**
-     * Should read "}" for next token.
-     */
-    static final int STATUS_READ_END_OBJECT     = 0x0008;
-
-    /**
-     * Should read object key for next token.
-     */
-    static final int STATUS_READ_OBJECT_KEY     = 0x0010;
-
-    /**
-     * Should read object value for next token.
-     */
-    static final int STATUS_READ_OBJECT_VALUE   = 0x0020;
-
-    /**
-     * Should read ":" for next token.
-     */
-    static final int STATUS_READ_COLON          = 0x0040;
-
-    /**
-     * Should read "," for next token.
-     */
-    static final int STATUS_READ_COMMA          = 0x0080;
-
-    /**
-     * Should read "[" for next token.
-     */
-    static final int STATUS_READ_BEGIN_ARRAY    = 0x0100;
-
-    /**
-     * Should read "]" for next token.
-     */
-    static final int STATUS_READ_END_ARRAY      = 0x0200;
-
-    /**
-     * Should read array value for next token.
-     */
-    static final int STATUS_READ_ARRAY_VALUE    = 0x0400;
-
-    /**
-     * Should read a single value for next token (excludes "{" and "[").
-     */
-    static final int STATUS_READ_SINGLE_VALUE   = 0x0800;
-
-    boolean hasStatus(int expectedStatus) {
+	boolean hasStatus(int expectedStatus) {
         return ((status & expectedStatus) > 0);
-    }
-
-    Map<String, Object> newObject() {
-        return new HashMap<String, Object>();
-    }
-
-    List<Object> newArray() {
-        return new ArrayList<Object>();
     }
 
     Object checkExpectedType(Object obj, Class<?> clazz) {
@@ -123,12 +41,14 @@ public class JsonStream {
         return (T) checkExpectedType(parse(), clazz);
     }
 
+    Stack stack;
+    int status;
+
     public Object parse() throws IOException {
         stack = new Stack();
         status = STATUS_READ_SINGLE_VALUE | STATUS_READ_BEGIN_OBJECT | STATUS_READ_BEGIN_ARRAY;
         for (;;) {
         	Token currentToken = reader.readNextToken();
-        	System.out.println(">>> Token: " + currentToken.name());
         	switch (currentToken) {
             case BOOLEAN:
                 Boolean bool = reader.readBoolean();
@@ -298,7 +218,7 @@ public class JsonStream {
 
             case START_ARRAY:
                 if (hasStatus(STATUS_READ_BEGIN_ARRAY)) {
-                    stack.push(StackValue.newJsonArray(newArray()));
+                    stack.push(StackValue.newJsonArray(this.jsonArrayFactory.createJsonArray()));
                     status = STATUS_READ_ARRAY_VALUE | STATUS_READ_BEGIN_OBJECT | STATUS_READ_BEGIN_ARRAY| STATUS_READ_END_ARRAY;
                     continue;
                 }
@@ -306,7 +226,7 @@ public class JsonStream {
 
             case START_OBJECT:
                 if (hasStatus(STATUS_READ_BEGIN_OBJECT)) {
-                    stack.push(StackValue.newJsonObject(newObject()));
+                    stack.push(StackValue.newJsonObject(this.jsonObjectFactory.createJsonObject()));
                     status = STATUS_READ_OBJECT_KEY | STATUS_READ_BEGIN_OBJECT | STATUS_READ_END_OBJECT;
                     continue;
                 }
@@ -314,5 +234,60 @@ public class JsonStream {
         	}
         }
 	}
+
+    /**
+     * Should read EOF for next token.
+     */
+    static final int STATUS_READ_END_DOCUMENT   = 0x0002;
+
+    /**
+     * Should read "{" for next token.
+     */
+    static final int STATUS_READ_BEGIN_OBJECT   = 0x0004;
+
+    /**
+     * Should read "}" for next token.
+     */
+    static final int STATUS_READ_END_OBJECT     = 0x0008;
+
+    /**
+     * Should read object key for next token.
+     */
+    static final int STATUS_READ_OBJECT_KEY     = 0x0010;
+
+    /**
+     * Should read object value for next token.
+     */
+    static final int STATUS_READ_OBJECT_VALUE   = 0x0020;
+
+    /**
+     * Should read ":" for next token.
+     */
+    static final int STATUS_READ_COLON          = 0x0040;
+
+    /**
+     * Should read "," for next token.
+     */
+    static final int STATUS_READ_COMMA          = 0x0080;
+
+    /**
+     * Should read "[" for next token.
+     */
+    static final int STATUS_READ_BEGIN_ARRAY    = 0x0100;
+
+    /**
+     * Should read "]" for next token.
+     */
+    static final int STATUS_READ_END_ARRAY      = 0x0200;
+
+    /**
+     * Should read array value for next token.
+     */
+    static final int STATUS_READ_ARRAY_VALUE    = 0x0400;
+
+    /**
+     * Should read a single value for next token (excludes "{" and "[").
+     */
+    static final int STATUS_READ_SINGLE_VALUE   = 0x0800;
 
 }

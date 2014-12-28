@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class JsonStream {
 
@@ -11,14 +12,18 @@ public class JsonStream {
 
     final JsonObjectFactory jsonObjectFactory;
     final JsonArrayFactory jsonArrayFactory;
+    final ObjectHook<?> objectHook;
 
-	public JsonStream(Reader reader, JsonObjectFactory jsonObjectFactory, JsonArrayFactory jsonArrayFactory) {
+	public JsonStream(Reader reader, JsonObjectFactory jsonObjectFactory, JsonArrayFactory jsonArrayFactory, ObjectHook<?> objectHook) {
 		this.reader = new TokenReader(new CharReader(reader));
         this.jsonObjectFactory = jsonObjectFactory != null ? jsonObjectFactory : () -> {
             return new HashMap<String, Object>();
         };
         this.jsonArrayFactory = jsonArrayFactory != null ? jsonArrayFactory : () -> {
             return new ArrayList<Object>();
+        };
+        this.objectHook = objectHook != null ? objectHook : (map) -> {
+            return map;
         };
 	}
 
@@ -211,6 +216,11 @@ public class JsonStream {
                 if (hasStatus(STATUS_READ_END_DOCUMENT)) {
                     StackValue v = stack.pop();
                     if (stack.isEmpty()) {
+                        if (v.type == StackValue.TYPE_OBJECT) {
+                            @SuppressWarnings("unchecked")
+                            Map<String, Object> map = (Map<String, Object>) v.value;
+                            return this.objectHook.toObject(map);
+                        }
                         return v.value;
                     }
                 }

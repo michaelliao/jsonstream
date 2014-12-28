@@ -11,6 +11,7 @@ public class JsonStreamBuilder {
     Reader reader;
     JsonObjectFactory jsonObjectFactory = null;
     JsonArrayFactory jsonArrayFactory = null;
+    ObjectHook<?> objectHook = null;
 
     public JsonStreamBuilder(String jsonStr) {
         this.reader = new StringReader(jsonStr);
@@ -39,7 +40,12 @@ public class JsonStreamBuilder {
         return this;
     }
 
+    public JsonStreamBuilder useObjectHook(ObjectHook<?> objectHook) {
+        this.objectHook = objectHook;
+        return this;
+    }
+
     public JsonStream create() {
-        return new JsonStream(reader, jsonObjectFactory, jsonArrayFactory);
+        return new JsonStream(reader, jsonObjectFactory, jsonArrayFactory, objectHook);
     }
 }

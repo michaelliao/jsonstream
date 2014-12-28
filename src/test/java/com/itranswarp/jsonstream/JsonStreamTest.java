@@ -18,7 +18,7 @@ public class JsonStreamTest {
     static final double DELTA = 0.00000001;
 
     JsonStream prepareJsonStream(String s) {
-        return new JsonStream(new StringReader(s), null, null);
+        return new JsonStream(new StringReader(s), null, null, null);
     }
 
     String prepareStandardJson(Object obj) {
@@ -346,4 +346,41 @@ public class JsonStreamTest {
             }
         }
     }
+
+    @Test
+    public void testParseReturnGenericType() throws Exception {
+        assertTrue(prepareJsonStream("true").parse(Boolean.class));
+        assertNull(prepareJsonStream("null").parse(Object.class));
+        assertEquals(12345L, prepareJsonStream("12345").parse(Long.class).longValue());
+        assertEquals(123.456, prepareJsonStream("123.456").parse(Double.class).doubleValue(), DELTA);
+        assertArrayEquals(new Object[] { 1L, 2L, 3L }, prepareJsonStream("[1,2,3]").parse(List.class).toArray());
+        assertEquals("world", prepareJsonStream("{\"hello\":\"world\"}").parse(Map.class).get("hello"));
+    }
+
+    @Test
+    public void testParseUseBeanObjectHook() throws Exception {
+        ObjectHook<Bean> objectHook = (map) -> {
+            Bean bean = new Bean();
+            bean.name = (String) map.get("name");
+            bean.version = (double) map.get("version");
+            bean.draft = (boolean) map.get("draft");
+            bean.tag = (String) map.get("tag");
+            return bean;
+        };
+        String s = "{\"name\":\"Java\", \"version\":1.8, \"draft\":false, \"tag\":null }";
+        JsonStream js = new JsonStreamBuilder(s).useObjectHook(objectHook).create();
+        Bean bean = js.parse(Bean.class);
+        assertEquals("Java", bean.name);
+        assertEquals(1.8, bean.version, DELTA);
+        assertFalse(bean.draft);
+        assertNull(bean.tag);
+    }
+
+}
+
+class Bean {
+    String name;
+    double version;
+    boolean draft;
+    String tag;
 }

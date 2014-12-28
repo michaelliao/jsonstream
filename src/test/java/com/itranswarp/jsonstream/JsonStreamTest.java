@@ -3,11 +3,15 @@ package com.itranswarp.jsonstream;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class JsonStreamTest {
 
@@ -226,4 +230,36 @@ public class JsonStreamTest {
         }
     }
 
+    String prepareStandardJson(Object obj) {
+        return new GsonBuilder().serializeNulls().create().toJson(obj);
+    }
+
+    Map<String, Object> prepareOrderedMap(Object ... args) {
+        if (args.length % 2 != 0) {
+            throw new RuntimeException("Must be key-value pairs.");
+        }
+        String key = null;
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
+        for (Object o : args) {
+            if (key == null) {
+                key = (String) o;
+            }
+            else {
+                map.put(key, o);
+                key = null;
+            }
+        }
+        return map;
+    }
+
+    @Test
+    public void testParseComplexObjectOk() throws Exception {
+        Map<String, Object> map = prepareOrderedMap("key1", true, "key2", null,
+                "key3", prepareOrderedMap("sub1", 1234, "sub2", "SUB2", "sub3", false),
+                "key4", "-END-");
+        String src = prepareStandardJson(map);
+        System.out.println(src);
+        Map<String, Object> parsed = (Map<String, Object>) prepareJsonStream(src).parse();
+        System.out.println(parsed);
+    }
 }

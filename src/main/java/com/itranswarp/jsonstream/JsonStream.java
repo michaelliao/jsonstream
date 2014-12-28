@@ -211,7 +211,7 @@ public class JsonStream {
                     status = STATUS_READ_COMMA | STATUS_READ_END_OBJECT;
                     continue;
                 }
-                if (status == STATUS_READ_ARRAY_VALUE) {
+                if (hasStatus(STATUS_READ_ARRAY_VALUE)) {
                     stack.peek(StackValue.TYPE_ARRAY).valueAsArray().add(str);
                     status = STATUS_READ_COMMA | STATUS_READ_END_ARRAY;
                     continue;
@@ -284,7 +284,7 @@ public class JsonStream {
                         continue;
                     }
                 }
-                throw new JsonParseException("Unexpected char: \']\'.", reader.reader.readed);
+                throw new JsonParseException("Unexpected char: \'}\'.", reader.reader.readed);
 
             case END_DOCUMENT:
                 if (hasStatus(STATUS_READ_END_DOCUMENT)) {
@@ -298,7 +298,7 @@ public class JsonStream {
             case START_ARRAY:
                 if (hasStatus(STATUS_READ_BEGIN_ARRAY)) {
                     stack.push(StackValue.newJsonArray(newArray()));
-                    status = STATUS_READ_ARRAY_VALUE;
+                    status = STATUS_READ_ARRAY_VALUE | STATUS_READ_END_ARRAY;
                     continue;
                 }
                 throw new JsonParseException("Unexpected char: \'[\'.", reader.reader.readed);
@@ -306,7 +306,7 @@ public class JsonStream {
             case START_OBJECT:
                 if (hasStatus(STATUS_READ_BEGIN_OBJECT)) {
                     stack.push(StackValue.newJsonObject(newObject()));
-                    status = STATUS_READ_OBJECT_KEY;
+                    status = STATUS_READ_OBJECT_KEY | STATUS_READ_END_OBJECT;
                     continue;
                 }
                 throw new JsonParseException("Unexpected char: \'{\'.", reader.reader.readed);

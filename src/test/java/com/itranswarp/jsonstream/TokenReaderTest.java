@@ -158,26 +158,25 @@ public class TokenReaderTest {
 
     @Test
     public void testReadNumberAsLongOk() throws Exception {
-        assertEquals(0L, ((Long) prepareTokenReader("0").readNumber()).longValue());
-        assertEquals(0L, ((Long) prepareTokenReader("00").readNumber()).longValue());
-        assertEquals(0L, ((Long) prepareTokenReader("0,").readNumber()).longValue());
-        assertEquals(0L, ((Long) prepareTokenReader("00;").readNumber()).longValue());
-        assertEquals(0L, ((Long) prepareTokenReader("-0").readNumber()).longValue());
-        assertEquals(0L, ((Long) prepareTokenReader("-00").readNumber()).longValue());
-        assertEquals(1L, ((Long) prepareTokenReader("1").readNumber()).longValue());
-        assertEquals(1L, ((Long) prepareTokenReader("01").readNumber()).longValue());
-        assertEquals(-1L, ((Long) prepareTokenReader("-1").readNumber()).longValue());
-        assertEquals(-1L, ((Long) prepareTokenReader("-01").readNumber()).longValue());
-        assertEquals(100L, ((Long) prepareTokenReader("100").readNumber()).longValue());
-        assertEquals(1020L, ((Long) prepareTokenReader("1020").readNumber()).longValue());
-        assertEquals(-100L, ((Long) prepareTokenReader("-100").readNumber()).longValue());
-        assertEquals(-1020L, ((Long) prepareTokenReader("-1020").readNumber()).longValue());
-        assertEquals(999000999L, ((Long) prepareTokenReader("999000999").readNumber()).longValue());
-        assertEquals(999000999000L, ((Long) prepareTokenReader("999000999000").readNumber()).longValue());
-        assertEquals(-999000999L, ((Long) prepareTokenReader("-999000999").readNumber()).longValue());
-        assertEquals(-999000999000L, ((Long) prepareTokenReader("-999000999000").readNumber()).longValue());
-        assertEquals(9007199254740991L, ((Long) prepareTokenReader("9007199254740991").readNumber()).longValue());
-        assertEquals(9007199254740991L, ((Long) prepareTokenReader("9007199254740991x").readNumber()).longValue());
+        String[] tests = {
+                "0", "00", "000", "-0", "-00",
+                "1", "01", "-1", "-01",
+                "100", "1020", "-100", "-1020",
+                "999000999", "999000999000", "-999000999", "-999000999000",
+                "9007199254740991", "-9007199254740991"
+        };
+        for (String s : tests) {
+            assertEquals(Long.parseLong(s), ((Long) prepareTokenReader(s).readNumber()).longValue());
+            assertEquals(Long.parseLong(s), ((Long) prepareTokenReader(s + " ").readNumber()).longValue());
+            assertEquals(Long.parseLong(s), ((Long) prepareTokenReader(s + ",").readNumber()).longValue());
+            assertEquals(Long.parseLong(s), ((Long) prepareTokenReader(s + ";").readNumber()).longValue());
+            assertEquals(Long.parseLong(s), ((Long) prepareTokenReader(s + "]").readNumber()).longValue());
+            assertEquals(Long.parseLong(s), ((Long) prepareTokenReader(s + "}").readNumber()).longValue());
+            assertEquals(Long.parseLong(s), ((Long) prepareTokenReader(s + "+").readNumber()).longValue());
+            assertEquals(Long.parseLong(s), ((Long) prepareTokenReader(s + "\n").readNumber()).longValue());
+            assertEquals(Long.parseLong(s), ((Long) prepareTokenReader(s + "\\").readNumber()).longValue());
+            
+        }
     }
 
     @Test

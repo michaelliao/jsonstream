@@ -233,7 +233,7 @@ public class JsonStream {
                         continue;
                     }
                     if (hasStatus(STATUS_READ_END_ARRAY)) {
-                        status = STATUS_READ_ARRAY_VALUE;
+                        status = STATUS_READ_ARRAY_VALUE | STATUS_READ_BEGIN_ARRAY | STATUS_READ_BEGIN_OBJECT;
                         continue;
                     }
                 }
@@ -299,7 +299,7 @@ public class JsonStream {
             case START_ARRAY:
                 if (hasStatus(STATUS_READ_BEGIN_ARRAY)) {
                     stack.push(StackValue.newJsonArray(newArray()));
-                    status = STATUS_READ_ARRAY_VALUE | STATUS_READ_BEGIN_ARRAY| STATUS_READ_END_ARRAY;
+                    status = STATUS_READ_ARRAY_VALUE | STATUS_READ_BEGIN_OBJECT | STATUS_READ_BEGIN_ARRAY| STATUS_READ_END_ARRAY;
                     continue;
                 }
                 throw new JsonParseException("Unexpected char: \'[\'.", reader.reader.readed);

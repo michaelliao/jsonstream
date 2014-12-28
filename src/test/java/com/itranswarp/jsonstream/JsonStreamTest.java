@@ -2,6 +2,7 @@ package com.itranswarp.jsonstream;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,6 +20,36 @@ public class JsonStreamTest {
 
     JsonStream prepareJsonStream(String s) {
         return new JsonStream(s);
+    }
+
+    String prepareStandardJson(Object obj) {
+        return new GsonBuilder().serializeNulls().create().toJson(obj);
+    }
+
+    Map<String, Object> prepareOrderedMap(Object ... args) {
+        if (args.length % 2 != 0) {
+            throw new RuntimeException("Must be key-value pairs.");
+        }
+        String key = null;
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
+        for (Object o : args) {
+            if (key == null) {
+                key = (String) o;
+            }
+            else {
+                map.put(key, o);
+                key = null;
+            }
+        }
+        return map;
+    }
+
+    List<Object> prepareList(Object ... args) {
+        List<Object> list = new ArrayList<Object>();
+        for (Object o : args) {
+            list.add(o);
+        }
+        return list;
     }
 
     @Test
@@ -230,36 +261,69 @@ public class JsonStreamTest {
         }
     }
 
-    String prepareStandardJson(Object obj) {
-        return new GsonBuilder().serializeNulls().create().toJson(obj);
-    }
-
-    Map<String, Object> prepareOrderedMap(Object ... args) {
-        if (args.length % 2 != 0) {
-            throw new RuntimeException("Must be key-value pairs.");
-        }
-        String key = null;
-        Map<String, Object> map = new LinkedHashMap<String, Object>();
-        for (Object o : args) {
-            if (key == null) {
-                key = (String) o;
-            }
-            else {
-                map.put(key, o);
-                key = null;
-            }
-        }
-        return map;
-    }
-
     @Test
+    @SuppressWarnings("unchecked")
     public void testParseComplexObjectOk() throws Exception {
-        Map<String, Object> map = prepareOrderedMap("key1", true, "key2", null,
+        Map<String, Object> map = prepareOrderedMap(
+                "key1", true,
+                "key2", null,
                 "key3", prepareOrderedMap("sub1", 1234, "sub2", "SUB2", "sub3", false),
                 "key4", "-END-");
         String src = prepareStandardJson(map);
-        System.out.println(src);
         Map<String, Object> parsed = (Map<String, Object>) prepareJsonStream(src).parse();
-        System.out.println(parsed);
+        // check:
+        assertTrue((Boolean) parsed.get("key1"));
+        assertNull(parsed.get("key2"));
+        assertEquals("-END-", parsed.get("key4"));
+        Map<String, Object> nested = (Map<String, Object>) parsed.get("key3");
+        assertEquals(1234L, ((Long) nested.get("sub1")).longValue());
+        assertEquals("SUB2", nested.get("sub2"));
+        assertFalse((Boolean) nested.get("sub3"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testParseComplexObjectWithArrayOk() throws Exception {
+        Map<String, Object> map = prepareOrderedMap(
+                "key1", true,
+                "key2", prepareList(12, 34.5, null, "LIST", false),
+                "key3", prepareOrderedMap(
+                        "sub1", prepareList(),
+                        "sub2", "SUB2",
+                        "sub3", prepareList(true)),
+                "key4", "-END-");
+        String src = prepareStandardJson(map);
+        Map<String, Object> parsed = (Map<String, Object>) prepareJsonStream(src).parse();
+        // check:
+        assertTrue((Boolean) parsed.get("key1"));
+        assertArrayEquals(new Object[] { 12L, 34.5, null, "LIST", false }, ((List<Object>) parsed.get("key2")).toArray());
+        assertEquals("-END-", parsed.get("key4"));
+        Map<String, Object> nested = (Map<String, Object>) parsed.get("key3");
+        assertArrayEquals(new Object[] {}, ((List<Object>) nested.get("sub1")).toArray());
+        assertEquals("SUB2", nested.get("sub2"));
+        assertArrayEquals(new Object[] { true }, ((List<Object>) nested.get("sub3")).toArray());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testNestedArrayWithObjectOk() throws Exception {
+        List<Object> list = prepareList(
+                prepareList(
+                        1,
+                        2,
+                        prepareList(
+                                3,
+                                4,
+                                prepareList(prepareList()))),
+                prepareList(
+                        prepareList(
+                                prepareList(5, 6))),
+                prepareList(
+                        prepareOrderedMap(),
+                        prepareOrderedMap("array", prepareList(7, 8)),
+                        prepareOrderedMap("array", prepareList(9, prepareList()))));
+        String src = prepareStandardJson(list);
+        List<Object> parsed = (List<Object>) prepareJsonStream(src).parse();
+        assertEquals(src, prepareStandardJson(parsed));
     }
 }

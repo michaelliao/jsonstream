@@ -278,6 +278,9 @@ class TokenReader {
 			case READ_NUMBER_END:
 				// build parsed number:
 				int readed = reader.readed;
+				if (intPart==null) {
+				    throw new JsonParseException("Missing integer part of number.", readed);
+				}
 				long lInt = minusSign ? -string2Long(intPart, readed)
 						: string2Long(intPart, readed);
 				if (!hasFraPart && !hasExpPart) {

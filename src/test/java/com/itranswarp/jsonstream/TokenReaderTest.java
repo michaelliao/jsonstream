@@ -219,6 +219,8 @@ public class TokenReaderTest {
     @Test
     public void testReadNumberFailed() throws Exception {
         String[] INVALID_NUMBER_STRINGS = {
+                "-",
+                "+",
                 "1.",
                 "1.a",
                 "-.5",

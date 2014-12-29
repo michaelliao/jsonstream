@@ -3,6 +3,11 @@ package com.itranswarp.jsonstream;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Value object to push and pop in stack when parsing JSON.
+ * 
+ * @author Michael Liao
+ */
 class StackValue {
 
     static final int TYPE_OBJECT = 0;

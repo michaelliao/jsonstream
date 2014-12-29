@@ -2,6 +2,11 @@ package com.itranswarp.jsonstream;
 
 import java.util.EmptyStackException;
 
+/**
+ * A stack for parsing JSON.
+ * 
+ * @author Michael Liao
+ */
 class Stack {
 
 	final int SIZE;

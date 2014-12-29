@@ -1,5 +1,10 @@
 package com.itranswarp.jsonstream;
 
+/**
+ * All types of token reads by TokenReader.
+ * 
+ * @author Michael Liao
+ */
 enum Token {
 
     /**

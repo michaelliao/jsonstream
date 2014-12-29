@@ -35,22 +35,22 @@ class TokenReader {
 		switch (ch) {
 		case '{':
 			reader.next(); // skip
-			return Token.START_OBJECT;
+			return Token.BEGIN_OBJECT;
 		case '}':
 			reader.next(); // skip
 			return Token.END_OBJECT;
 		case '[':
 			reader.next(); // skip
-			return Token.START_ARRAY;
+			return Token.BEGIN_ARRAY;
 		case ']':
 			reader.next(); // skip
 			return Token.END_ARRAY;
 		case ':':
 			reader.next(); // skip
-			return Token.COLON_SEPERATOR;
+			return Token.SEP_COLON;
 		case ',':
 			reader.next(); // skip
-			return Token.COMMA_SEPERATOR;
+			return Token.SEP_COMMA;
 		case '\"':
 			return Token.STRING;
 		case 'n':

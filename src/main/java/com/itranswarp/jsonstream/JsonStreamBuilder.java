@@ -6,6 +6,11 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 
+/**
+ * Builder for create JsonStream much easier.
+ * 
+ * @author Michael Liao
+ */
 public class JsonStreamBuilder {
 
     Reader reader;

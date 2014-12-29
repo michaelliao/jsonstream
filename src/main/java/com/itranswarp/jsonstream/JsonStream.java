@@ -60,8 +60,8 @@ public class JsonStream {
         stack = new Stack();
         status = STATUS_EXPECT_SINGLE_VALUE | STATUS_EXPECT_BEGIN_OBJECT | STATUS_EXPECT_BEGIN_ARRAY;
         for (;;) {
-        	Token currentToken = reader.readNextToken();
-        	switch (currentToken) {
+            Token currentToken = reader.readNextToken();
+            switch (currentToken) {
             case BOOLEAN:
                 Boolean bool = reader.readBoolean();
                 if (hasStatus(STATUS_EXPECT_SINGLE_VALUE)) {

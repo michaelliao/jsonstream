@@ -2,8 +2,8 @@ package com.itranswarp.jsonstream;
 
 import java.util.Map;
 
-public interface ObjectHook<T> {
+public interface ObjectHook {
 
-    T toObject(Map<String, Object> map);
+    Object toObject(Map<String, Object> map, Class<?> clazz);
 
 }

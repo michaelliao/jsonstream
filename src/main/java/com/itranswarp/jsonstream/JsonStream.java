@@ -16,10 +16,10 @@ public class JsonStream {
     final TokenReader reader;
     final JsonObjectFactory jsonObjectFactory;
     final JsonArrayFactory jsonArrayFactory;
-    final ObjectHook<?> objectHook;
+    final ObjectHook objectHook;
 
     public JsonStream(Reader reader, JsonObjectFactory jsonObjectFactory,
-            JsonArrayFactory jsonArrayFactory, ObjectHook<?> objectHook) {
+            JsonArrayFactory jsonArrayFactory, ObjectHook objectHook) {
         this.reader = new TokenReader(new CharReader(reader));
         this.jsonObjectFactory = jsonObjectFactory != null ? jsonObjectFactory
                 : () -> {
@@ -29,9 +29,7 @@ public class JsonStream {
                 : () -> {
                     return new ArrayList<Object>();
                 };
-        this.objectHook = objectHook != null ? objectHook : (map) -> {
-            return map;
-        };
+        this.objectHook = objectHook;
     }
 
 	boolean hasStatus(int expectedStatus) {
@@ -45,12 +43,17 @@ public class JsonStream {
         if (obj==null && clazz==Object.class) {
             return null;
         }
-        throw new ClassCastException("Cannot case parsed result to expected type: " + clazz.getName());
+        throw new ClassCastException("Cannot case parsed result from: " + obj.getClass().getName() + " to expected type: " + clazz.getName());
     }
 
     @SuppressWarnings("unchecked")
     public <T> T parse(Class<T> clazz) throws IOException {
-        return (T) checkExpectedType(parse(), clazz);
+        Object obj = parse();
+        if (obj instanceof Map && !clazz.isAssignableFrom(Map.class)) {
+            ObjectHook objectHook = this.objectHook == null ? new BeanObjectHook() : this.objectHook;
+            obj = objectHook.toObject((Map<String, Object>) obj, clazz);
+        }
+        return (T) checkExpectedType(obj, clazz);
     }
 
     Stack stack;
@@ -149,7 +152,7 @@ public class JsonStream {
                     status = STATUS_EXPECT_COMMA | STATUS_EXPECT_END_ARRAY;
                     continue;
                 }
-                throw new RuntimeException("should not reach here.");
+                throw new JsonParseException("Unexpected char \'\"\'..", reader.reader.readed);
 
             case SEP_COLON: // :
                 if (status == STATUS_EXPECT_COLON) {
@@ -200,6 +203,7 @@ public class JsonStream {
                 if (hasStatus(STATUS_EXPECT_END_OBJECT)) {
                     StackValue object = stack.pop(StackValue.TYPE_OBJECT);
                     if (stack.isEmpty()) {
+                        // root object:
                         stack.push(object);
                         status = STATUS_EXPECT_END_DOCUMENT;
                         continue;
@@ -223,11 +227,6 @@ public class JsonStream {
                 if (hasStatus(STATUS_EXPECT_END_DOCUMENT)) {
                     StackValue v = stack.pop();
                     if (stack.isEmpty()) {
-                        if (v.type == StackValue.TYPE_OBJECT) {
-                            @SuppressWarnings("unchecked")
-                            Map<String, Object> map = (Map<String, Object>) v.value;
-                            return this.objectHook.toObject(map);
-                        }
                         return v.value;
                     }
                 }

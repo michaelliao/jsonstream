@@ -50,6 +50,11 @@ class Stack {
 		throw new JsonParseException("Unmatched object or array.");
 	}
 
+	Class<?> getTopValueClass() {
+	    StackValue obj = array[pos-1];
+	    return obj.value.getClass();
+	}
+
 	int getTopValueType() {
 	    StackValue obj = array[pos-1];
 	    return obj.type;

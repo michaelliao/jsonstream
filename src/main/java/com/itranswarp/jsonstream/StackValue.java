@@ -26,6 +26,10 @@ class StackValue {
         this.value = value;
     }
 
+    static StackValue newJsonObject(Object obj) {
+        return new StackValue(TYPE_OBJECT, obj);
+    }
+
     static StackValue newJsonObject(Map<String, Object> map) {
         return new StackValue(TYPE_OBJECT, map);
     }

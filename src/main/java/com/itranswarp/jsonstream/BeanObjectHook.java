@@ -16,12 +16,13 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Convert JSON object (Map<String, Object> to JavaBean object, and recursively if necessary.
+ * Convert JSON object (Map<String, Object>) to JavaBean object, and recursively if necessary.
  * 
  * @author Michael Liao
  */
 public class BeanObjectHook implements ObjectHook {
 
+    // cache for PropertySetters:
     Map<String, PropertySetters> setters = new HashMap<String, PropertySetters>();
 
     /**
@@ -39,7 +40,7 @@ public class BeanObjectHook implements ObjectHook {
             setters.put(clazz.getName(), pss);
         }
         try {
-            Object target = newInstance(clazz);
+            Object target = newInstance(clazz, map);
             for (String propertyName : map.keySet()) {
                 PropertySetter ps = pss.getPropertySetter(propertyName);
                 if (ps != null) {
@@ -94,6 +95,13 @@ public class BeanObjectHook implements ObjectHook {
         }
     }
 
+    /**
+     * Convert a simple value object to specific type.
+     * 
+     * @param genericType Object type: int.class, String.class, Float.class, etc.
+     * @param element Value object.
+     * @return Converted object.
+     */
     Object toSimpleValue(Class<?> genericType, Object element) {
         if (element == null) {
             return null;
@@ -175,7 +183,16 @@ public class BeanObjectHook implements ObjectHook {
         return SIMPLE_VALUE_NAMES.contains(name);
     }
 
-    Object newInstance(Class<?> clazz) throws InstantiationException, IllegalAccessException {
+    /**
+     * Create a new JavaBean instance.
+     * 
+     * @param clazz JavaBean class.
+     * @param jsonObject The Json object as Map.
+     * @return JavaBean instance.
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     */
+    protected Object newInstance(Class<?> clazz, Map<String, Object> jsonObject) throws InstantiationException, IllegalAccessException {
         return clazz.newInstance();
     }
 
@@ -213,15 +230,12 @@ class PropertySetters {
                 Class<?> propertyType = getRawType(type);
                 Class<?> genericType = getGenericType(type);
                 map.put(propertyName, new PropertySetter() {
-                    @Override
                     public Class<?> getPropertyType() {
                         return propertyType;
                     }
-                    @Override
                     public Class<?> getGenericType() {
                         return genericType;
                     }
-                    @Override
                     public void setProperty(Object obj, Object value) throws Exception {
                         m.invoke(obj, value);
                     }
@@ -237,15 +251,12 @@ class PropertySetters {
                 Class<?> propertyType = getRawType(type);
                 Class<?> genericType = getGenericType(type);
                 map.put(propertyName, new PropertySetter() {
-                    @Override
                     public Class<?> getPropertyType() {
                         return propertyType;
                     }
-                    @Override
                     public Class<?> getGenericType() {
                         return genericType;
                     }
-                    @Override
                     public void setProperty(Object obj, Object value) throws Exception {
                         f.set(obj, value);
                     }
@@ -255,6 +266,9 @@ class PropertySetters {
         this.map = map;
     }
 
+    /**
+     * Get raw type of property, e.g. String, List, JavaBean, etc.
+     */
     Class<?> getRawType(Type type) {
         if (type instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType) type;
@@ -263,6 +277,10 @@ class PropertySetters {
         return (Class<?>) type;
     }
 
+    /**
+     * Get generic type of property, e.g. generic type of List<String> is String. 
+     * Return null if no generic type.
+     */
     Class<?> getGenericType(Type type) {
         if (type instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType) type;

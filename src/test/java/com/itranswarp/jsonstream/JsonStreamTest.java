@@ -334,6 +334,9 @@ public class JsonStreamTest {
                 " [ { \"A\":    [ true, true ],  \"B\":  [ null, null, [ \"should be ] but }\" ] ], \"C\":   {}  }  }  ",
                 " { \"A\": [  \"missing end }\"   ]  ",
                 " { \"A\": [  \"missing ,\"   ] \"B\": 0 }",
+                " { \"A\": [  \"missing ,\"  true ]  }",
+                " { \"A\": [  \"missing ,\"  1.2 ]  }",
+                " { \"A\": [  \"missing ,\"  null ]  }",
                 " { \"A\": [  \"should be } but ]\"   ] ] ",
                 " { \"A\": [ \"has extra }\", []] } }   "
         };

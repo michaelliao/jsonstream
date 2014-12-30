@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -329,8 +330,10 @@ public class JsonStreamTest {
     @Test()
     public void testParseWithInvalidJson() throws Exception {
         String[] tests = {
+                " { \"A\": [  \"missing ,\"   ] \"B\": 0 }",
                 " [ { \"A\":    [ true, true ],  \"B\":  [ null, null, [ \"should be ] but }\" ] ], \"C\":   {}  }  }  ",
                 " { \"A\": [  \"missing end }\"   ]  ",
+                " { \"A\": [  \"missing ,\"   ] \"B\": 0 }",
                 " { \"A\": [  \"should be } but ]\"   ] ] ",
                 " { \"A\": [ \"has extra }\", []] } }   "
         };
@@ -359,28 +362,64 @@ public class JsonStreamTest {
 
     @Test
     public void testParseUseBeanObjectHook() throws Exception {
-        ObjectHook<Bean> objectHook = (map) -> {
-            Bean bean = new Bean();
-            bean.name = (String) map.get("name");
-            bean.version = (double) map.get("version");
-            bean.draft = (boolean) map.get("draft");
-            bean.tag = (String) map.get("tag");
-            return bean;
-        };
-        String s = "{\"name\":\"Java\", \"version\":1.8, \"draft\":false, \"tag\":null }";
-        JsonStream js = new JsonStreamBuilder(s).useObjectHook(objectHook).create();
-        Bean bean = js.parse(Bean.class);
+        String s = "{\"name\":\"Java\", \"version\":1.8, \"draft\":false, "
+                + " \"longList\": [10, 20, 30, 40, 50],  "
+                + " \"longArray\": [1, 2, 3, 4, 5],  "
+                + " \"intArray\": [-1, -2, -3, -4, -5],  "
+                + " \"stringArray\": [null, \"@@@\"],  "
+                + " \"friends\": [ { \"id\": 123, \"name\": \"A1\" }, null, { \"id\": 456, \"name\": \"A2\" }  ],  "
+                + " \"address\":{ \"street\": \"No.1 West Road\", \"zipcode\": \"100101\"} }";
+        JsonStream js = new JsonStreamBuilder(s).create();
+        User bean = js.parse(User.class);
         assertEquals("Java", bean.name);
         assertEquals(1.8, bean.version, DELTA);
         assertFalse(bean.draft);
-        assertNull(bean.tag);
+        assertTrue(bean.address instanceof Address);
+        assertEquals("No.1 West Road", bean.address.street);
+        assertEquals("100101", bean.address.zipcode);
+        System.out.println("User -> JSON: " + prepareStandardJson(bean));
+    }
+
+    @Test
+    public void testParseUseCustomObjectHook() throws Exception {
+        ObjectHook objectHook = (map, clazz) -> {
+            System.out.println("objectHook -> " + clazz);
+            User bean = new User();
+            bean.name = (String) map.get("name");
+            bean.version = (double) map.get("version");
+            bean.draft = (boolean) map.get("draft");
+            bean.address = null;
+            return bean;
+        };
+        String s = "{\"name\":\"Java\", \"version\":1.8, \"draft\":false, \"address\":{ \"street\": \"No.1 West Road\", \"zipcode\": \"100101\"} }";
+        JsonStream js = new JsonStreamBuilder(s).useObjectHook(objectHook).create();
+        User bean = js.parse(User.class);
+        assertEquals("Java", bean.name);
+        assertEquals(1.8, bean.version, DELTA);
+        assertFalse(bean.draft);
+        assertNull(bean.address);
     }
 
 }
 
-class Bean {
+class User {
     String name;
     double version;
     boolean draft;
-    String tag;
+    Address address;
+    long[] longArray;
+    int[] intArray;
+    String[] stringArray;
+    Collection<Long> longList;
+    List<Friend> friends;
+}
+
+class Address {
+    String street;
+    String zipcode;
+}
+
+class Friend {
+    long id;
+    String name;
 }

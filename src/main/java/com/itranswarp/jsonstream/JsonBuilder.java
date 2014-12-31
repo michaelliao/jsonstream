@@ -16,8 +16,13 @@ public class JsonBuilder {
     JsonObjectFactory jsonObjectFactory = null;
     JsonArrayFactory jsonArrayFactory = null;
     ObjectHook objectHook = null;
+    TypeAdapters typeAdapters = new TypeAdapters();
 
     public JsonBuilder() {
+    }
+
+    public <T> void registerTypeAdapter(Class<T> clazz, TypeAdapter<T> typeAdapter) {
+        typeAdapters.registerTypeAdapter(clazz, typeAdapter);
     }
 
     public JsonBuilder useJsonObjectFactory(JsonObjectFactory jsonObjectFactory) {

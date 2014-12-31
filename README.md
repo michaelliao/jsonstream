@@ -7,6 +7,6 @@ Example:
 
 ```
 String jsonString = "{\"key\": \"value\"}";
-JsonStream jsonStream = JsonStreamBuilder(jsonString).createJsonStream();
-Map<String, Object> result = jsonStream.parse();
+JsonReader jsonReader = JsonReaderBuilder(jsonString).create();
+Map<String, Object> result = jsonReader.parse();
 ```

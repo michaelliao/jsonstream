@@ -7,26 +7,26 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 
 /**
- * Builder for create JsonStream much easier.
+ * Builder for create JsonReader much easier.
  * 
  * @author Michael Liao
  */
-public class JsonStreamBuilder {
+public class JsonReaderBuilder {
 
     Reader reader;
     JsonObjectFactory jsonObjectFactory = null;
     JsonArrayFactory jsonArrayFactory = null;
     ObjectHook objectHook = null;
 
-    public JsonStreamBuilder(String jsonStr) {
+    public JsonReaderBuilder(String jsonStr) {
         this.reader = new StringReader(jsonStr);
     }
 
-    public JsonStreamBuilder(Reader reader) {
+    public JsonReaderBuilder(Reader reader) {
         this.reader = reader;
     }
 
-    public JsonStreamBuilder(InputStream input) {
+    public JsonReaderBuilder(InputStream input) {
         try {
             this.reader = new InputStreamReader(input, "UTF-8");
         }
@@ -35,22 +35,27 @@ public class JsonStreamBuilder {
         }
     }
 
-    public JsonStreamBuilder useJsonObjectFactory(JsonObjectFactory jsonObjectFactory) {
+    public JsonReaderBuilder useJsonObjectFactory(JsonObjectFactory jsonObjectFactory) {
         this.jsonObjectFactory = jsonObjectFactory;
         return this;
     }
 
-    public JsonStreamBuilder useJsonArrayFactory(JsonArrayFactory jsonArrayFactory) {
+    public JsonReaderBuilder useJsonArrayFactory(JsonArrayFactory jsonArrayFactory) {
         this.jsonArrayFactory = jsonArrayFactory;
         return this;
     }
 
-    public JsonStreamBuilder useObjectHook(ObjectHook objectHook) {
+    public JsonReaderBuilder useObjectHook(ObjectHook objectHook) {
         this.objectHook = objectHook;
         return this;
     }
 
-    public JsonStream create() {
-        return new JsonStream(reader, jsonObjectFactory, jsonArrayFactory, objectHook);
+    /**
+     * Create a JsonReader object.
+     * 
+     * @return JsonReader object.
+     */
+    public JsonReader create() {
+        return new JsonReader(reader, jsonObjectFactory, jsonArrayFactory, objectHook);
     }
 }

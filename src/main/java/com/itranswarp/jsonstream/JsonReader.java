@@ -11,14 +11,14 @@ import java.util.Map;
  * 
  * @author Michael Liao
  */
-public class JsonStream {
+public class JsonReader {
 
     final TokenReader reader;
     final JsonObjectFactory jsonObjectFactory;
     final JsonArrayFactory jsonArrayFactory;
     final ObjectHook objectHook;
 
-    public JsonStream(Reader reader, JsonObjectFactory jsonObjectFactory,
+    public JsonReader(Reader reader, JsonObjectFactory jsonObjectFactory,
             JsonArrayFactory jsonArrayFactory, ObjectHook objectHook) {
         this.reader = new TokenReader(new CharReader(reader));
         this.jsonObjectFactory = jsonObjectFactory != null ? jsonObjectFactory

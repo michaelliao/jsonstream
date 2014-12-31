@@ -14,12 +14,12 @@ import org.junit.Test;
 
 import com.google.gson.GsonBuilder;
 
-public class JsonStreamTest {
+public class JsonReaderTest {
 
     static final double DELTA = 0.00000001;
 
-    JsonStream prepareJsonStream(String s) {
-        return new JsonStream(new StringReader(s), null, null, null);
+    JsonReader prepareJsonReader(String s) {
+        return new JsonReader(new StringReader(s), null, null, null);
     }
 
     String prepareStandardJson(Object obj) {
@@ -54,12 +54,12 @@ public class JsonStreamTest {
 
     @Test
     public void testParseSingleStringOk() throws Exception {
-        assertEquals("", prepareJsonStream("\"\"").parse());
-        assertEquals(" ", prepareJsonStream("\" \"").parse());
-        assertEquals("A\'BC", prepareJsonStream("\"A\'BC\"").parse());
-        assertEquals("\r\n\t\b\f\\\"/$", prepareJsonStream("\"\\r\\n\\t\\b\\f\\\\\\\"\\/$\"").parse());
-        assertEquals("English中文", prepareJsonStream("\"English中文\"").parse());
-        assertEquals("English中文", prepareJsonStream("\"English\\u4E2d\\u6587\"").parse());
+        assertEquals("", prepareJsonReader("\"\"").parse());
+        assertEquals(" ", prepareJsonReader("\" \"").parse());
+        assertEquals("A\'BC", prepareJsonReader("\"A\'BC\"").parse());
+        assertEquals("\r\n\t\b\f\\\"/$", prepareJsonReader("\"\\r\\n\\t\\b\\f\\\\\\\"\\/$\"").parse());
+        assertEquals("English中文", prepareJsonReader("\"English中文\"").parse());
+        assertEquals("English中文", prepareJsonReader("\"English\\u4E2d\\u6587\"").parse());
     }
 
     @Test
@@ -74,7 +74,7 @@ public class JsonStreamTest {
         };
         for (String s : INVALID_STRINGS) {
             try {
-                prepareJsonStream(s).parse();
+                prepareJsonReader(s).parse();
                 fail("Not caught ParseException: " + s);
             }
             catch (JsonParseException e) {
@@ -85,21 +85,21 @@ public class JsonStreamTest {
 
     @Test
     public void testParseSingleBoolean() throws Exception {
-        assertEquals(Boolean.TRUE, prepareJsonStream("true").parse());
-        assertEquals(Boolean.TRUE, prepareJsonStream("\ttrue \r\n ").parse());
-        assertEquals(Boolean.TRUE, prepareJsonStream(" \n \t true \t \n ").parse());
+        assertEquals(Boolean.TRUE, prepareJsonReader("true").parse());
+        assertEquals(Boolean.TRUE, prepareJsonReader("\ttrue \r\n ").parse());
+        assertEquals(Boolean.TRUE, prepareJsonReader(" \n \t true \t \n ").parse());
 
-        assertEquals(Boolean.FALSE, prepareJsonStream("false").parse());
-        assertEquals(Boolean.FALSE, prepareJsonStream(" false \r\n ").parse());
-        assertEquals(Boolean.FALSE, prepareJsonStream("\r  \nfalse \t \r").parse());
+        assertEquals(Boolean.FALSE, prepareJsonReader("false").parse());
+        assertEquals(Boolean.FALSE, prepareJsonReader(" false \r\n ").parse());
+        assertEquals(Boolean.FALSE, prepareJsonReader("\r  \nfalse \t \r").parse());
     }
 
     @Test
     public void testParseSingleNull() throws Exception {
-        assertNull(prepareJsonStream("null").parse());
-        assertNull(prepareJsonStream(" null \r\n ").parse());
-        assertNull(prepareJsonStream(" null \t  ").parse());
-        assertNull(prepareJsonStream(" \n \t null \r  ").parse());
+        assertNull(prepareJsonReader("null").parse());
+        assertNull(prepareJsonReader(" null \r\n ").parse());
+        assertNull(prepareJsonReader(" null \t  ").parse());
+        assertNull(prepareJsonReader(" \n \t null \r  ").parse());
     }
 
     @Test
@@ -112,10 +112,10 @@ public class JsonStreamTest {
                 "9007199254740991", "-9007199254740991"
         };
         for (String s : tests) {
-            assertEquals(Long.parseLong(s), ((Long) prepareJsonStream(s).parse()).longValue());
-            assertEquals(Long.parseLong(s), ((Long) prepareJsonStream(s + " \r\t\n \n").parse()).longValue());
-            assertEquals(Long.parseLong(s), ((Long) prepareJsonStream("\n  \t " + s).parse()).longValue());
-            assertEquals(Long.parseLong(s), ((Long) prepareJsonStream(" \n  \t \r" + s + "\t \r \n\n").parse()).longValue());
+            assertEquals(Long.parseLong(s), ((Long) prepareJsonReader(s).parse()).longValue());
+            assertEquals(Long.parseLong(s), ((Long) prepareJsonReader(s + " \r\t\n \n").parse()).longValue());
+            assertEquals(Long.parseLong(s), ((Long) prepareJsonReader("\n  \t " + s).parse()).longValue());
+            assertEquals(Long.parseLong(s), ((Long) prepareJsonReader(" \n  \t \r" + s + "\t \r \n\n").parse()).longValue());
         }
     }
 
@@ -141,7 +141,7 @@ public class JsonStreamTest {
                         continue;
                     }
                     try {
-                        prepareJsonStream(pre + s + end).parse();
+                        prepareJsonReader(pre + s + end).parse();
                         fail("Not caught JsonParseException when parse: " + pre + s + end + ".");
                     }
                     catch (JsonParseException e) {
@@ -166,10 +166,10 @@ public class JsonStreamTest {
                 "-1.23e+1", "-1.23e+2", "-123e+12", "-1.23e+12"
         };
         for (String s : tests) {
-            assertEquals(Double.parseDouble(s), ((Double) prepareJsonStream(s).parse()).doubleValue(), DELTA);
-            assertEquals(Double.parseDouble(s), ((Double) prepareJsonStream(s + " \r\t\n \n").parse()).doubleValue(), DELTA);
-            assertEquals(Double.parseDouble(s), ((Double) prepareJsonStream("\n  \t " + s).parse()).doubleValue(), DELTA);
-            assertEquals(Double.parseDouble(s), ((Double) prepareJsonStream(" \n  \t \r" + s + "\t \r \n\n").parse()).doubleValue(), DELTA);
+            assertEquals(Double.parseDouble(s), ((Double) prepareJsonReader(s).parse()).doubleValue(), DELTA);
+            assertEquals(Double.parseDouble(s), ((Double) prepareJsonReader(s + " \r\t\n \n").parse()).doubleValue(), DELTA);
+            assertEquals(Double.parseDouble(s), ((Double) prepareJsonReader("\n  \t " + s).parse()).doubleValue(), DELTA);
+            assertEquals(Double.parseDouble(s), ((Double) prepareJsonReader(" \n  \t \r" + s + "\t \r \n\n").parse()).doubleValue(), DELTA);
         }
     }
 
@@ -199,7 +199,7 @@ public class JsonStreamTest {
                         continue;
                     }
                     try {
-                        prepareJsonStream(pre + s + end).parse();
+                        prepareJsonReader(pre + s + end).parse();
                         fail("Not caught JsonParseException when parse: " + pre + s + end + ".");
                     }
                     catch (JsonParseException e) {
@@ -218,8 +218,8 @@ public class JsonStreamTest {
         };
         Object[] expecteds = {};
         for (String s : tests) {
-            assertArrayEquals(expecteds, ((List<?>) prepareJsonStream(s).parse()).toArray());
-            Map<?, ?> map = (Map<?, ?>) prepareJsonStream(s.replace('[', '{').replace(']', '}')).parse();
+            assertArrayEquals(expecteds, ((List<?>) prepareJsonReader(s).parse()).toArray());
+            Map<?, ?> map = (Map<?, ?>) prepareJsonReader(s.replace('[', '{').replace(']', '}')).parse();
             assertTrue(map.isEmpty());
         }
     }
@@ -235,7 +235,7 @@ public class JsonStreamTest {
         };
         Object[] expecteds = {"TEST", true, 1L, false, 2.5, null, "END"};
         for (String s : tests) {
-            assertArrayEquals(expecteds, ((List<?>) prepareJsonStream(s).parse()).toArray());
+            assertArrayEquals(expecteds, ((List<?>) prepareJsonReader(s).parse()).toArray());
         }
     }
 
@@ -252,7 +252,7 @@ public class JsonStreamTest {
         Arrays.sort(expecteds);
         for (String s : tests) {
             @SuppressWarnings("unchecked")
-            Map<String, Object> map = (Map<String, Object>) prepareJsonStream(s).parse();
+            Map<String, Object> map = (Map<String, Object>) prepareJsonReader(s).parse();
             Object[] keys = map.keySet().toArray();
             Arrays.sort(keys);
             assertArrayEquals(expecteds, keys);
@@ -270,7 +270,7 @@ public class JsonStreamTest {
                 "key3", prepareOrderedMap("sub1", 1234, "sub2", "SUB2", "sub3", false),
                 "key4", "-END-");
         String src = prepareStandardJson(map);
-        Map<String, Object> parsed = (Map<String, Object>) prepareJsonStream(src).parse();
+        Map<String, Object> parsed = (Map<String, Object>) prepareJsonReader(src).parse();
         // check:
         assertTrue((Boolean) parsed.get("key1"));
         assertNull(parsed.get("key2"));
@@ -293,7 +293,7 @@ public class JsonStreamTest {
                         "sub3", prepareList(true)),
                 "key4", "-END-");
         String src = prepareStandardJson(map);
-        Map<String, Object> parsed = (Map<String, Object>) prepareJsonStream(src).parse();
+        Map<String, Object> parsed = (Map<String, Object>) prepareJsonReader(src).parse();
         // check:
         assertTrue((Boolean) parsed.get("key1"));
         assertArrayEquals(new Object[] { 12L, 34.5, null, "LIST", false }, ((List<Object>) parsed.get("key2")).toArray());
@@ -323,7 +323,7 @@ public class JsonStreamTest {
                         prepareOrderedMap("array", prepareList(7, 8)),
                         prepareOrderedMap("array", prepareList(9, prepareList()))));
         String src = prepareStandardJson(list);
-        List<Object> parsed = (List<Object>) prepareJsonStream(src).parse();
+        List<Object> parsed = (List<Object>) prepareJsonReader(src).parse();
         assertEquals(src, prepareStandardJson(parsed));
     }
 
@@ -342,7 +342,7 @@ public class JsonStreamTest {
         };
         for (String s : tests) {
             try {
-                prepareJsonStream(s).parse();
+                prepareJsonReader(s).parse();
                 fail("Not caught JsonParseException when parse: " + s);
             }
             catch (JsonParseException e) {
@@ -355,12 +355,12 @@ public class JsonStreamTest {
 
     @Test
     public void testParseReturnGenericType() throws Exception {
-        assertTrue(prepareJsonStream("true").parse(Boolean.class));
-        assertNull(prepareJsonStream("null").parse(Object.class));
-        assertEquals(12345L, prepareJsonStream("12345").parse(Long.class).longValue());
-        assertEquals(123.456, prepareJsonStream("123.456").parse(Double.class).doubleValue(), DELTA);
-        assertArrayEquals(new Object[] { 1L, 2L, 3L }, prepareJsonStream("[1,2,3]").parse(List.class).toArray());
-        assertEquals("world", prepareJsonStream("{\"hello\":\"world\"}").parse(Map.class).get("hello"));
+        assertTrue(prepareJsonReader("true").parse(Boolean.class));
+        assertNull(prepareJsonReader("null").parse(Object.class));
+        assertEquals(12345L, prepareJsonReader("12345").parse(Long.class).longValue());
+        assertEquals(123.456, prepareJsonReader("123.456").parse(Double.class).doubleValue(), DELTA);
+        assertArrayEquals(new Object[] { 1L, 2L, 3L }, prepareJsonReader("[1,2,3]").parse(List.class).toArray());
+        assertEquals("world", prepareJsonReader("{\"hello\":\"world\"}").parse(Map.class).get("hello"));
     }
 
     @Test
@@ -372,7 +372,7 @@ public class JsonStreamTest {
                 + " \"stringArray\": [null, \"@@@\"],  "
                 + " \"friends\": [ { \"id\": 123, \"name\": \"A1\" }, null, { \"id\": 456, \"name\": \"A2\" }  ],  "
                 + " \"address\":{ \"street\": \"No.1 West Road\", \"zipcode\": \"100101\"} }";
-        JsonStream js = new JsonStreamBuilder(s).create();
+        JsonReader js = new JsonReaderBuilder(s).create();
         User bean = js.parse(User.class);
         assertTrue(bean.methodSetVersionIsCalled);
         assertEquals("Java", bean.name);
@@ -396,7 +396,7 @@ public class JsonStreamTest {
             return bean;
         };
         String s = "{\"name\":\"Java\", \"version\":1.8, \"draft\":false, \"address\":{ \"street\": \"No.1 West Road\", \"zipcode\": \"100101\"} }";
-        JsonStream js = new JsonStreamBuilder(s).useObjectHook(objectHook).create();
+        JsonReader js = new JsonReaderBuilder(s).useObjectHook(objectHook).create();
         User bean = js.parse(User.class);
         assertEquals("Java", bean.name);
         assertEquals(1.8, bean.version, DELTA);

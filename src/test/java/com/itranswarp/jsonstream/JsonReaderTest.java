@@ -372,7 +372,7 @@ public class JsonReaderTest {
                 + " \"stringArray\": [null, \"@@@\"],  "
                 + " \"friends\": [ { \"id\": 123, \"name\": \"A1\" }, null, { \"id\": 456, \"name\": \"A2\" }  ],  "
                 + " \"address\":{ \"street\": \"No.1 West Road\", \"zipcode\": \"100101\"} }";
-        JsonReader js = new JsonReaderBuilder(s).create();
+        JsonReader js = new JsonBuilder().createReader(s);
         User bean = js.parse(User.class);
         assertTrue(bean.methodSetVersionIsCalled);
         assertEquals("Java", bean.name);
@@ -396,7 +396,7 @@ public class JsonReaderTest {
             return bean;
         };
         String s = "{\"name\":\"Java\", \"version\":1.8, \"draft\":false, \"address\":{ \"street\": \"No.1 West Road\", \"zipcode\": \"100101\"} }";
-        JsonReader js = new JsonReaderBuilder(s).useObjectHook(objectHook).create();
+        JsonReader js = new JsonBuilder().useObjectHook(objectHook).createReader(s);
         User bean = js.parse(User.class);
         assertEquals("Java", bean.name);
         assertEquals(1.8, bean.version, DELTA);

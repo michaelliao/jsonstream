@@ -12,38 +12,35 @@ class PropertySetters {
     static final Field[] EMPTY_FIELDS = new Field[0];
     static final Method[] EMPTY_METHODS = new Method[0];
 
-    // final Log log = LogFactory.getLog(getClass());
     final Class<?> clazz;
     final Map<String, PropertySetter> map;
 
-    public PropertySetters(Class<?> clazz) {
+    PropertySetters(Class<?> clazz) {
         this.clazz = clazz;
         Map<String, PropertySetter> map = new HashMap<String, PropertySetter>();
-        Map<String, Method> methods = getAllMethods(clazz);
+        Map<String, Method> methods = PropertyUtils.getAllSetters(clazz);
         for (String propertyName : methods.keySet()) {
             Method m = methods.get(propertyName);
-            if (propertyName != null) {
-                m.setAccessible(true);
-                Type type = m.getGenericParameterTypes()[0];
-                Class<?> propertyType = getRawType(type);
-                Class<?> genericType = getGenericType(type);
-                map.put(propertyName, new PropertySetter() {
-                    public Class<?> getPropertyType() {
-                        return propertyType;
-                    }
-                    public Class<?> getGenericType() {
-                        return genericType;
-                    }
-                    public void setProperty(Object obj, Object value) throws Exception {
-                        m.invoke(obj, value);
-                    }
-                });
-            }
+            m.setAccessible(true);
+            Type type = m.getGenericParameterTypes()[0];
+            Class<?> propertyType = getRawType(type);
+            Class<?> genericType = getGenericType(type);
+            map.put(propertyName, new PropertySetter() {
+                public Class<?> getPropertyType() {
+                    return propertyType;
+                }
+                public Class<?> getGenericType() {
+                    return genericType;
+                }
+                public void setProperty(Object obj, Object value) throws Exception {
+                    m.invoke(obj, value);
+                }
+            });
         }
-        Map<String, Field> fields = getAllFields(clazz);
+        Map<String, Field> fields = PropertyUtils.getAllFields(clazz);
         for (String propertyName : fields.keySet()) {
-            Field f = fields.get(propertyName);
             if (! map.containsKey(propertyName)) {
+                Field f = fields.get(propertyName);
                 f.setAccessible(true);
                 Type type = f.getGenericType();
                 Class<?> propertyType = getRawType(type);
@@ -62,33 +59,6 @@ class PropertySetters {
             }
         }
         this.map = map;
-    }
-
-    Map<String, Method> getAllMethods(Class<?> clazz) {
-        Map<String, Method> methods = new HashMap<String, Method>();
-        while (clazz != null) {
-            for (Method m : clazz.getDeclaredMethods()) {
-                String propertyName = getPropertyName(m);
-                if (! methods.containsKey(propertyName)) {
-                    methods.put(propertyName, m);
-                }
-            }
-            clazz = clazz.getSuperclass();
-        }
-        return methods;
-    }
-
-    Map<String, Field> getAllFields(Class<?> clazz) {
-        Map<String, Field> fields = new HashMap<String, Field>();
-        while (clazz != null) {
-            for (Field f : clazz.getDeclaredFields()) {
-                if (! fields.containsKey(f.getName())) {
-                    fields.put(f.getName(), f);
-                }
-            }
-            clazz = clazz.getSuperclass();
-        }
-        return fields;
     }
 
     /**
@@ -123,17 +93,6 @@ class PropertySetters {
 
     PropertySetter getPropertySetter(String name) {
         return this.map.get(name);
-    }
-
-    String getPropertyName(Method m) {
-        String name = m.getName();
-        if (name.startsWith("set") && (name.length() >= 4)
-                && m.getReturnType().equals(void.class)
-                && (m.getParameterTypes().length == 1)
-        ) {
-            return Character.toLowerCase(name.charAt(3)) + name.substring(4);
-        }
-        return null;
     }
 
 }

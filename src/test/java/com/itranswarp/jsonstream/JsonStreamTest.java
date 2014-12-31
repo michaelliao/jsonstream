@@ -374,6 +374,7 @@ public class JsonStreamTest {
                 + " \"address\":{ \"street\": \"No.1 West Road\", \"zipcode\": \"100101\"} }";
         JsonStream js = new JsonStreamBuilder(s).create();
         User bean = js.parse(User.class);
+        assertTrue(bean.methodSetVersionIsCalled);
         assertEquals("Java", bean.name);
         assertEquals(1.8, bean.version, DELTA);
         assertFalse(bean.draft);
@@ -405,10 +406,21 @@ public class JsonStreamTest {
 
 }
 
-class User {
-    String name;
+abstract class AbstractUser {
     double version;
     boolean draft;
+
+    boolean methodSetVersionIsCalled = false;
+
+    void setVersion(double version) {
+        System.out.println("call: setVersion(" + version + ");");
+        this.version = version;
+        this.methodSetVersionIsCalled = true;
+    }
+}
+
+class User extends AbstractUser {
+    String name;
     Address address;
     long[] longArray;
     int[] intArray;

@@ -79,6 +79,9 @@ public class BeanObjectHook implements ObjectHook {
                             throw new JsonBindException("Cannot set Json array to property: " + propertyName + "(type: " + propertyType.getName() + ")");
                         }
                     }
+                    else {
+                        value = toSimpleValue(ps.getPropertyType(), value);
+                    }
                     ps.setProperty(target, value);
                 }
             }
@@ -103,17 +106,22 @@ public class BeanObjectHook implements ObjectHook {
         if (element == null) {
             return null;
         }
-        Converter converter = NUMBER_CONVERTERS.get(genericType.getName());
+        if (genericType.isEnum() && (element instanceof String)) {
+            @SuppressWarnings({ "unchecked", "rawtypes" })
+            Enum<?> enumValue = Enum.valueOf((Class<? extends Enum>) genericType, (String) element);
+            return enumValue;
+        }
+        Converter converter = SIMPLE_VALUE_CONVERTERS.get(genericType.getName());
         if (converter != null) {
             return converter.convert(element);
         }
         return element;
     }
 
-    static final Map<String, Converter> NUMBER_CONVERTERS;
+    static final Map<String, Converter> SIMPLE_VALUE_CONVERTERS;
 
     static {
-        NUMBER_CONVERTERS = new HashMap<String, Converter>();
+        SIMPLE_VALUE_CONVERTERS = new HashMap<String, Converter>();
         Converter intConveter = (value) -> {
             if (value instanceof Long) {
                 return ((Long) value).intValue();
@@ -154,16 +162,16 @@ public class BeanObjectHook implements ObjectHook {
             }
             throw new NumberFormatException("Cannot convert long to BigDecimal.");
         };
-        NUMBER_CONVERTERS.put(int.class.getName(), intConveter);
-        NUMBER_CONVERTERS.put(Integer.class.getName(), intConveter);
-        NUMBER_CONVERTERS.put(short.class.getName(), shortConveter);
-        NUMBER_CONVERTERS.put(Short.class.getName(), shortConveter);
-        NUMBER_CONVERTERS.put(byte.class.getName(), byteConveter);
-        NUMBER_CONVERTERS.put(Byte.class.getName(), byteConveter);
-        NUMBER_CONVERTERS.put(float.class.getName(), floatConveter);
-        NUMBER_CONVERTERS.put(Float.class.getName(), floatConveter);
-        NUMBER_CONVERTERS.put(BigInteger.class.getName(), bigIntegerConveter);
-        NUMBER_CONVERTERS.put(BigDecimal.class.getName(), bigDecimalConveter);
+        SIMPLE_VALUE_CONVERTERS.put(int.class.getName(), intConveter);
+        SIMPLE_VALUE_CONVERTERS.put(Integer.class.getName(), intConveter);
+        SIMPLE_VALUE_CONVERTERS.put(short.class.getName(), shortConveter);
+        SIMPLE_VALUE_CONVERTERS.put(Short.class.getName(), shortConveter);
+        SIMPLE_VALUE_CONVERTERS.put(byte.class.getName(), byteConveter);
+        SIMPLE_VALUE_CONVERTERS.put(Byte.class.getName(), byteConveter);
+        SIMPLE_VALUE_CONVERTERS.put(float.class.getName(), floatConveter);
+        SIMPLE_VALUE_CONVERTERS.put(Float.class.getName(), floatConveter);
+        SIMPLE_VALUE_CONVERTERS.put(BigInteger.class.getName(), bigIntegerConveter);
+        SIMPLE_VALUE_CONVERTERS.put(BigDecimal.class.getName(), bigDecimalConveter);
     }
 
     static final Set<String> SIMPLE_VALUE_NAMES = new HashSet<String>(

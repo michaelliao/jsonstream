@@ -7,6 +7,12 @@ import java.util.Map;
 
 public class PropertyUtils {
 
+    /**
+     * Get getter name. "getName" -> "name", "isMale" -> "male".
+     * 
+     * @param m Method object.
+     * @return Property name of this getter.
+     */
     private static String getGetterName(Method m) {
         String name = m.getName();
         if (name.startsWith("get") && (name.length() >= 4)
@@ -24,6 +30,12 @@ public class PropertyUtils {
         return null;
     }
 
+    /**
+     * Get setter name. "setName" -> "name"
+     * 
+     * @param m Method object.
+     * @return Property name of this setter.
+     */
     private static String getSetterName(Method m) {
         String name = m.getName();
         if (name.startsWith("set") && (name.length() >= 4)

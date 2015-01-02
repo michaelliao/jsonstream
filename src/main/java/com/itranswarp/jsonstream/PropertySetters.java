@@ -7,6 +7,11 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * To set value to bean property by conversion if necessary.
+ * 
+ * @author Michael Liao
+ */
 class PropertySetters {
 
     static final Field[] EMPTY_FIELDS = new Field[0];

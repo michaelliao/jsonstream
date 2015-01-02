@@ -6,7 +6,9 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PropertyUtils {
+import com.itranswarp.jsonstream.annotation.Ignore;
+
+class PropertyUtils {
 
     /**
      * Get getter name. "getName" -> "name", "isMale" -> "male".
@@ -52,7 +54,7 @@ public class PropertyUtils {
         Map<String, Method> methods = new HashMap<String, Method>();
         while (clazz != null) {
             for (Method m : clazz.getDeclaredMethods()) {
-                if (Modifier.isStatic(m.getModifiers())) {
+                if (shouldIgnore(m)) {
                     continue;
                 }
                 String propertyName = getGetterName(m);
@@ -69,7 +71,7 @@ public class PropertyUtils {
         Map<String, Method> methods = new HashMap<String, Method>();
         while (clazz != null) {
             for (Method m : clazz.getDeclaredMethods()) {
-                if (Modifier.isStatic(m.getModifiers())) {
+                if (shouldIgnore(m)) {
                     continue;
                 }
                 String propertyName = getSetterName(m);
@@ -86,7 +88,7 @@ public class PropertyUtils {
         Map<String, Field> fields = new HashMap<String, Field>();
         while (clazz != null) {
             for (Field f : clazz.getDeclaredFields()) {
-                if (Modifier.isStatic(f.getModifiers())) {
+                if (shouldIgnore(f)) {
                     continue;
                 }
                 if (! fields.containsKey(f.getName())) {
@@ -98,4 +100,11 @@ public class PropertyUtils {
         return fields;
     }
 
+    static boolean shouldIgnore(Method m) {
+        return Modifier.isStatic(m.getModifiers()) || m.isAnnotationPresent(Ignore.class);
+    }
+
+    static boolean shouldIgnore(Field f) {
+        return Modifier.isStatic(f.getModifiers()) || f.isAnnotationPresent(Ignore.class);
+    }
 }

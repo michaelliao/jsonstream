@@ -5,6 +5,11 @@ import java.time.format.DateTimeFormatter;
 
 import com.itranswarp.jsonstream.TypeAdapter;
 
+/**
+ * Standard DateTime type adapter for conversion between String and LocalDateTime.
+ * 
+ * @author Michael Liao
+ */
 public class DateTimeTypeAdapter implements TypeAdapter<LocalDateTime> {
 
     DateTimeFormatter formatter;

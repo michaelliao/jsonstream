@@ -365,7 +365,7 @@ public class JsonReaderTest {
 
     @Test
     public void testParseUseBeanObjectHook() throws Exception {
-        String s = "{\"name\":\"Java\", \"version\":1.8, \"draft\":false, \"level\": 9, \"role\":\"TEACHER\", "
+        String s = "{\"name\":\"Java\", \"avoidMe\": 999, \"version\":1.8, \"draft\":false, \"level\": 9, \"role\":\"TEACHER\", "
                 + " \"longList\": [10, 20, 30, 40, 50],  "
                 + " \"longArray\": [1, 2, 3, 4, 5],  "
                 + " \"intArray\": [-1, -2, -3, -4, -5],  "
@@ -374,6 +374,7 @@ public class JsonReaderTest {
                 + " \"address\":{ \"street\": \"No.1 West Road\", \"zipcode\": \"100101\"} }";
         JsonReader js = new JsonBuilder().createReader(s);
         User bean = js.parse(User.class);
+        assertEquals(100L, User.avoidMe);
         assertTrue(bean.methodSetVersionIsCalled);
         assertEquals("Java", bean.name);
         assertEquals(9, bean.level);
@@ -422,6 +423,7 @@ abstract class AbstractUser {
 }
 
 class User extends AbstractUser {
+    static long avoidMe = 100L;
     String name;
     short level;
     Address address;

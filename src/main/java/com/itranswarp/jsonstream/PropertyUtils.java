@@ -2,6 +2,7 @@ package com.itranswarp.jsonstream;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,6 +52,9 @@ public class PropertyUtils {
         Map<String, Method> methods = new HashMap<String, Method>();
         while (clazz != null) {
             for (Method m : clazz.getDeclaredMethods()) {
+                if (Modifier.isStatic(m.getModifiers())) {
+                    continue;
+                }
                 String propertyName = getGetterName(m);
                 if (propertyName!=null && !methods.containsKey(propertyName)) {
                     methods.put(propertyName, m);
@@ -65,6 +69,9 @@ public class PropertyUtils {
         Map<String, Method> methods = new HashMap<String, Method>();
         while (clazz != null) {
             for (Method m : clazz.getDeclaredMethods()) {
+                if (Modifier.isStatic(m.getModifiers())) {
+                    continue;
+                }
                 String propertyName = getSetterName(m);
                 if (propertyName!=null && !methods.containsKey(propertyName)) {
                     methods.put(propertyName, m);
@@ -79,6 +86,9 @@ public class PropertyUtils {
         Map<String, Field> fields = new HashMap<String, Field>();
         while (clazz != null) {
             for (Field f : clazz.getDeclaredFields()) {
+                if (Modifier.isStatic(f.getModifiers())) {
+                    continue;
+                }
                 if (! fields.containsKey(f.getName())) {
                     fields.put(f.getName(), f);
                 }

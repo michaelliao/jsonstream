@@ -6,7 +6,7 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.itranswarp.jsonstream.annotation.Ignore;
+import com.itranswarp.jsonstream.annotation.JsonIgnore;
 
 class PropertyUtils {
 
@@ -50,14 +50,24 @@ class PropertyUtils {
         return null;
     }
 
+    /**
+     * Get all getters of this class, includes inherited methods, but excludes 
+     * static methods. Methods marked as @JsonIgnore are put to as null.
+     * 
+     * @param clazz
+     * @return
+     */
     static Map<String, Method> getAllGetters(Class<?> clazz) {
         Map<String, Method> methods = new HashMap<String, Method>();
-        while (clazz != null) {
+        while (!clazz.equals(Object.class)) {
             for (Method m : clazz.getDeclaredMethods()) {
-                if (shouldIgnore(m)) {
+                if (Modifier.isStatic(m.getModifiers())) {
                     continue;
                 }
                 String propertyName = getGetterName(m);
+                if (shouldIgnore(m)) {
+                    methods.put(propertyName, null);
+                }
                 if (propertyName!=null && !methods.containsKey(propertyName)) {
                     methods.put(propertyName, m);
                 }
@@ -67,14 +77,24 @@ class PropertyUtils {
         return methods;
     }
 
+    /**
+     * Get all setters of this class, includes inherited methods, but excludes 
+     * static methods. Methods marked as @JsonIgnore are put to as null.
+     * 
+     * @param clazz
+     * @return
+     */
     static Map<String, Method> getAllSetters(Class<?> clazz) {
         Map<String, Method> methods = new HashMap<String, Method>();
-        while (clazz != null) {
+        while (!clazz.equals(Object.class)) {
             for (Method m : clazz.getDeclaredMethods()) {
-                if (shouldIgnore(m)) {
+                if (Modifier.isStatic(m.getModifiers())) {
                     continue;
                 }
                 String propertyName = getSetterName(m);
+                if (shouldIgnore(m)) {
+                    methods.put(propertyName, null);
+                }
                 if (propertyName!=null && !methods.containsKey(propertyName)) {
                     methods.put(propertyName, m);
                 }
@@ -86,9 +106,9 @@ class PropertyUtils {
 
     static Map<String, Field> getAllFields(Class<?> clazz) {
         Map<String, Field> fields = new HashMap<String, Field>();
-        while (clazz != null) {
+        while (!clazz.equals(Object.class)) {
             for (Field f : clazz.getDeclaredFields()) {
-                if (shouldIgnore(f)) {
+                if (Modifier.isStatic(f.getModifiers()) || shouldIgnore(f)) {
                     continue;
                 }
                 if (! fields.containsKey(f.getName())) {
@@ -101,10 +121,10 @@ class PropertyUtils {
     }
 
     static boolean shouldIgnore(Method m) {
-        return Modifier.isStatic(m.getModifiers()) || m.isAnnotationPresent(Ignore.class);
+        return m.isAnnotationPresent(JsonIgnore.class);
     }
 
     static boolean shouldIgnore(Field f) {
-        return Modifier.isStatic(f.getModifiers()) || f.isAnnotationPresent(Ignore.class);
+        return f.isAnnotationPresent(JsonIgnore.class);
     }
 }

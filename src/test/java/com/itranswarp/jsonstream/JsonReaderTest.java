@@ -13,6 +13,7 @@ import java.util.Map;
 import org.junit.Test;
 
 import com.google.gson.GsonBuilder;
+import com.itranswarp.jsonstream.annotation.JsonIgnore;
 
 public class JsonReaderTest {
 
@@ -365,7 +366,7 @@ public class JsonReaderTest {
 
     @Test
     public void testParseUseBeanObjectHook() throws Exception {
-        String s = "{\"name\":\"Java\", \"avoidMe\": 999, \"version\":1.8, \"draft\":false, \"level\": 9, \"role\":\"TEACHER\", "
+        String s = "{\"name\":\"Java\", \"avoidMe\": 999, \"shouldIgnore\": \"no\", \"version\":1.8, \"draft\":false, \"level\": 9, \"role\":\"TEACHER\", "
                 + " \"longList\": [10, 20, 30, 40, 50],  "
                 + " \"longArray\": [1, 2, 3, 4, 5],  "
                 + " \"intArray\": [-1, -2, -3, -4, -5],  "
@@ -375,6 +376,7 @@ public class JsonReaderTest {
         JsonReader js = new JsonBuilder().createReader(s);
         User bean = js.parse(User.class);
         assertEquals(100L, User.avoidMe);
+        assertEquals("yes", bean.shouldIgnore);
         assertTrue(bean.methodSetVersionIsCalled);
         assertEquals("Java", bean.name);
         assertEquals(9, bean.level);
@@ -426,6 +428,11 @@ class User extends AbstractUser {
     static long avoidMe = 100L;
     String name;
     short level;
+    String shouldIgnore = "yes";
+    @JsonIgnore
+    public void setShouldIgnore(String shouldIgnore) {
+        this.shouldIgnore = shouldIgnore;
+    }
     Address address;
     long[] longArray;
     int[] intArray;

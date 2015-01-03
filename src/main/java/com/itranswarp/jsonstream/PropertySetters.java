@@ -5,7 +5,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * To set value to bean property by conversion if necessary.
@@ -23,28 +25,34 @@ class PropertySetters {
     PropertySetters(Class<?> clazz) {
         this.clazz = clazz;
         Map<String, PropertySetter> map = new HashMap<String, PropertySetter>();
-        Map<String, Method> methods = PropertyUtils.getAllSetters(clazz);
-        for (String propertyName : methods.keySet()) {
-            Method m = methods.get(propertyName);
-            m.setAccessible(true);
-            Type type = m.getGenericParameterTypes()[0];
-            Class<?> propertyType = getRawType(type);
-            Class<?> genericType = getGenericType(type);
-            map.put(propertyName, new PropertySetter() {
-                public Class<?> getPropertyType() {
-                    return propertyType;
-                }
-                public Class<?> getGenericType() {
-                    return genericType;
-                }
-                public void setProperty(Object obj, Object value) throws Exception {
-                    m.invoke(obj, value);
-                }
-            });
+        Set<String> ignoredProperties = new HashSet<String>();
+        Map<String, Method> setters = PropertyUtils.getAllSetters(clazz);
+        for (String propertyName : setters.keySet()) {
+            Method m = setters.get(propertyName);
+            if (m==null) {
+                ignoredProperties.add(propertyName);
+            }
+            else {
+                m.setAccessible(true);
+                Type type = m.getGenericParameterTypes()[0];
+                Class<?> propertyType = getRawType(type);
+                Class<?> genericType = getGenericType(type);
+                map.put(propertyName, new PropertySetter() {
+                    public Class<?> getPropertyType() {
+                        return propertyType;
+                    }
+                    public Class<?> getGenericType() {
+                        return genericType;
+                    }
+                    public void setProperty(Object obj, Object value) throws Exception {
+                        m.invoke(obj, value);
+                    }
+                });
+            }
         }
         Map<String, Field> fields = PropertyUtils.getAllFields(clazz);
         for (String propertyName : fields.keySet()) {
-            if (! map.containsKey(propertyName)) {
+            if (! map.containsKey(propertyName) && ! ignoredProperties.contains(propertyName)) {
                 Field f = fields.get(propertyName);
                 f.setAccessible(true);
                 Type type = f.getGenericType();

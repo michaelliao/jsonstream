@@ -9,10 +9,37 @@
 
 	<name>jsonstream</name>
 	<url>https://github.com/michaelliao/jsonstream</url>
+    <description>Fast JSON serializer/deserializer with JavaBean bindings and validations.</description>
+
+    <scm>
+        <url>https://github.com/michaelliao/jsonstream</url>
+        <connection>https://github.com/michaelliao/jsonstream.git</connection>
+        <developerConnection>Michael Liao</developerConnection>
+    </scm>
+    <issueManagement>
+        <url>https://github.com/michaelliao/jsonstream</url>
+        <system>GitHub</system>
+    </issueManagement>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.2</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+                    <compilerArgument>-verbose</compilerArgument>
+                    <compilerArgument>-parameters</compilerArgument>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 	<dependencies>
 		<dependency>

@@ -4,8 +4,6 @@ import static org.junit.Assert.*;
 
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +11,6 @@ import java.util.Map;
 import org.junit.Test;
 
 import com.google.gson.GsonBuilder;
-import com.itranswarp.jsonstream.annotation.JsonIgnore;
 
 public class JsonReaderToAbstractBeanTest {
 

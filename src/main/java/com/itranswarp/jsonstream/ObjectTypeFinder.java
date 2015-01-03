@@ -2,6 +2,12 @@ package com.itranswarp.jsonstream;
 
 import java.util.Map;
 
+/**
+ * Return a subclass by detect subclass type from the parsed JSON map 
+ * when instantiate an abstract class.
+ * 
+ * @author Michael Liao
+ */
 public interface ObjectTypeFinder {
 
     /**

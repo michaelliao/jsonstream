@@ -10,10 +10,10 @@ import java.util.Map;
  */
 class TypeAdapters {
 
-    Map<String, TypeAdapterWrapper<?>> adapters = new HashMap<String, TypeAdapterWrapper<?>>();
+    Map<String, TypeAdapter<?>> adapters = new HashMap<String, TypeAdapter<?>>();
 
     public <T> void registerTypeAdapter(Class<T> clazz, TypeAdapter<T> typeAdapter) {
-        adapters.put(clazz.getName(), new TypeAdapterWrapper<T>(clazz, typeAdapter));
+        adapters.put(clazz.getName(), typeAdapter);
     }
 
     /**
@@ -22,24 +22,8 @@ class TypeAdapters {
      * @param clazz Class object.
      * @return TypeAdapter or null if not found.
      */
-    @SuppressWarnings("unchecked")
-    <T> TypeAdapter<T> getTypeAdapter(Class<T> clazz) {
-        return (TypeAdapter<T>) adapters.get(clazz.getName());
-    }
-
-    class TypeAdapterWrapper<T> {
-    
-        final Class<T> clazz;
-        final TypeAdapter<T> typeAdapter;
-    
-        public TypeAdapterWrapper(Class<T> clazz, TypeAdapter<T> typeAdapter) {
-            this.clazz = clazz;
-            this.typeAdapter = typeAdapter;
-        }
-    
-        boolean accept(Object obj) {
-            return clazz.isInstance(obj);
-        }
+    TypeAdapter<?> getTypeAdapter(Class<?> clazz) {
+        return (TypeAdapter<?>) adapters.get(clazz.getName());
     }
 
 }

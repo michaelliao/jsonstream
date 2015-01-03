@@ -17,15 +17,18 @@ public class JsonWriter {
     final boolean canToString;
     final Writer writer;
     final Map<String, PropertyGetters> cachedGetters = new ConcurrentHashMap<String, PropertyGetters>();
+    final TypeAdapters typeAdapters;
 
-    public JsonWriter() {
+    public JsonWriter(TypeAdapters typeAdapters) {
         this.canToString = true;
         this.writer = new StringWriter(1024);
+        this.typeAdapters = typeAdapters;
     }
 
-    public JsonWriter(Writer writer) {
+    public JsonWriter(Writer writer, TypeAdapters typeAdapters) {
         this.canToString = false;
         this.writer = writer;
+        this.typeAdapters = typeAdapters;
     }
 
     @Override
@@ -94,7 +97,7 @@ public class JsonWriter {
         writer.write('\"');
     }
 
-    void writeList(List<Object> list, int depth) throws IOException {
+    void writeList(List<Object> list, TypeAdapters typeAdapters, int depth) throws IOException {
         if (depth > MAX_DEPTH) {
             throw new JsonSerializeException("Maximum depth of nested object.");
         }
@@ -130,24 +133,24 @@ public class JsonWriter {
             else if (t instanceof List) {
                 @SuppressWarnings("unchecked")
                 List<Object> l = (List<Object>) t;
-                writeList(l, depth + 1);
+                writeList(l, typeAdapters, depth + 1);
             }
             else if (t instanceof Map) {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> m = (Map<String, Object>) t;
-                writeMap(m, depth + 1);
+                writeMap(m, typeAdapters, depth + 1);
             }
             else if (t.getClass().isArray()) {
-                writeArray(t, depth + 1);
+                writeArray(t, typeAdapters, depth + 1);
             }
             else {
-                writeObject(t, depth + 1);
+                writeObject(t, typeAdapters, depth + 1);
             }
         }
         writer.write(']');
     }
 
-    void writeArray(Object array, int depth) throws IOException {
+    void writeArray(Object array, TypeAdapters typeAdapters, int depth) throws IOException {
         if (depth > MAX_DEPTH) {
             throw new JsonSerializeException("Maximum depth of nested object.");
         }
@@ -173,11 +176,11 @@ public class JsonWriter {
             writer.write(Arrays.toString((byte[]) array));
         }
         else {
-            writeList(Arrays.asList((Object[]) array), depth);
+            writeList(Arrays.asList((Object[]) array), typeAdapters, depth);
         }
     }
 
-    void writeMap(Map<String, Object> map, int depth) throws IOException {
+    void writeMap(Map<String, Object> map, TypeAdapters typeAdapters, int depth) throws IOException {
         if (depth > MAX_DEPTH) {
             throw new JsonSerializeException("Maximum depth of nested object.");
         }
@@ -207,7 +210,7 @@ public class JsonWriter {
         writer.write('}');
     }
 
-    void writeObject(Object bean, int depth) throws IOException {
+    void writeObject(Object bean, TypeAdapters typeAdapters, int depth) throws IOException {
         if (depth > MAX_DEPTH) {
             throw new JsonSerializeException("Maximum depth of nested object.");
         }
@@ -215,7 +218,16 @@ public class JsonWriter {
             writeNull();
             return;
         }
-        String className = bean.getClass().getName();
+        Class<? extends Object> beanClass = bean.getClass();
+        if (typeAdapters != null) {
+            TypeAdapter adapter = typeAdapters.getTypeAdapter(beanClass);
+            if (adapter != null) {
+                String result = adapter.serialize(bean);
+                writeString(result);
+                return;
+            }
+        }
+        String className = beanClass.getName();
         PropertyGetters pgs = cachedGetters.get(className);
         if (pgs == null) {
             pgs = new PropertyGetters(bean.getClass());
@@ -276,7 +288,7 @@ public class JsonWriter {
             return;
         }
         if (obj instanceof List) {
-            writeList((List<Object>) obj, depth);
+            writeList((List<Object>) obj, typeAdapters, depth);
             return;
         }
         if (obj instanceof Boolean) {
@@ -293,9 +305,9 @@ public class JsonWriter {
             return;
         }
         if (clazz.isArray()) {
-            writeArray(obj, depth);
+            writeArray(obj, typeAdapters, depth);
             return;
         }
-        writeObject(obj, depth);
+        writeObject(obj, typeAdapters, depth);
     }
 }

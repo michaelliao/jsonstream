@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 
 /**
  * Builder for create JsonReader much easier.
@@ -21,8 +22,9 @@ public class JsonBuilder {
     public JsonBuilder() {
     }
 
-    public <T> void registerTypeAdapter(Class<T> clazz, TypeAdapter<T> typeAdapter) {
+    public <T> JsonBuilder registerTypeAdapter(Class<T> clazz, TypeAdapter<T> typeAdapter) {
         typeAdapters.registerTypeAdapter(clazz, typeAdapter);
+        return this;
     }
 
     public JsonBuilder useJsonObjectFactory(JsonObjectFactory jsonObjectFactory) {
@@ -45,7 +47,7 @@ public class JsonBuilder {
     }
 
     public JsonReader createReader(Reader reader) {
-        return new JsonReader(reader, jsonObjectFactory, jsonArrayFactory, objectHook);
+        return new JsonReader(reader, jsonObjectFactory, jsonArrayFactory, objectHook, typeAdapters);
     }
 
     public JsonReader createReader(InputStream input) {
@@ -55,5 +57,13 @@ public class JsonBuilder {
         catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public JsonWriter createWriter() {
+        return new JsonWriter(typeAdapters);
+    }
+
+    public JsonWriter createWriter(Writer writer) {
+        return new JsonWriter(writer, typeAdapters);
     }
 }

@@ -16,7 +16,7 @@ public class JsonWriterTest {
     static final float DELTA = 0.00001f;
 
     JsonWriter prepareJsonWriter() {
-        return new JsonWriter();
+        return new JsonBuilder().createWriter();
     }
 
     <T> T loadByGson(Class<T> clazz, String jsonStr) {

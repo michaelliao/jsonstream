@@ -15,7 +15,7 @@ import com.google.gson.GsonBuilder;
 public class JsonReaderToAbstractBeanTest {
 
     JsonReader prepareJsonReader(String s) {
-        return new JsonReader(new StringReader(s), null, null, null);
+        return new JsonReader(new StringReader(s), null, null, null, null);
     }
 
     String prepareStandardJson(Object obj) {

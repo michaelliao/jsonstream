@@ -20,7 +20,7 @@ public class JsonReaderTest {
     static final double DELTA = 0.00000001;
 
     JsonReader prepareJsonReader(String s) {
-        return new JsonReader(new StringReader(s), null, null, null);
+        return new JsonReader(new StringReader(s), null, null, null, null);
     }
 
     String prepareStandardJson(Object obj) {
@@ -392,7 +392,7 @@ public class JsonReaderTest {
 
     @Test
     public void testParseUseCustomObjectHook() throws Exception {
-        ObjectHook objectHook = (map, clazz) -> {
+        ObjectHook objectHook = (map, clazz, adapters) -> {
             System.out.println("objectHook -> " + clazz);
             User bean = new User();
             bean.name = (String) map.get("name");

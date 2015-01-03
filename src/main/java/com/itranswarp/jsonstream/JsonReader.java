@@ -17,9 +17,10 @@ public class JsonReader {
     final JsonObjectFactory jsonObjectFactory;
     final JsonArrayFactory jsonArrayFactory;
     final ObjectHook objectHook;
+    final TypeAdapters typeAdapters;
 
     public JsonReader(Reader reader, JsonObjectFactory jsonObjectFactory,
-            JsonArrayFactory jsonArrayFactory, ObjectHook objectHook) {
+            JsonArrayFactory jsonArrayFactory, ObjectHook objectHook, TypeAdapters typeAdapters) {
         this.reader = new TokenReader(new CharReader(reader));
         this.jsonObjectFactory = jsonObjectFactory != null ? jsonObjectFactory
                 : () -> {
@@ -30,6 +31,7 @@ public class JsonReader {
                     return new ArrayList<Object>();
                 };
         this.objectHook = objectHook;
+        this.typeAdapters = typeAdapters;
     }
 
 	boolean hasStatus(int expectedStatus) {
@@ -51,7 +53,7 @@ public class JsonReader {
         Object obj = parse();
         if (obj instanceof Map && !clazz.isAssignableFrom(Map.class)) {
             ObjectHook objectHook = this.objectHook == null ? new BeanObjectHook() : this.objectHook;
-            obj = objectHook.toObject((Map<String, Object>) obj, clazz);
+            obj = objectHook.toObject((Map<String, Object>) obj, clazz, typeAdapters);
         }
         return (T) checkExpectedType(obj, clazz);
     }

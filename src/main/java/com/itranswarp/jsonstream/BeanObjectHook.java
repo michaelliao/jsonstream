@@ -40,7 +40,7 @@ public class BeanObjectHook implements ObjectHook {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Object toObject(Map<String, Object> jsonObjectMap, Class<?> clazz) {
+    public Object toObject(Map<String, Object> jsonObjectMap, Class<?> clazz, TypeAdapters typeAdapters) {
         clazz = this.objectTypeFinder.find(clazz, jsonObjectMap);
         String beanClassName = clazz.getName();
         log.info("Convert JSON object to bean: " + beanClassName);
@@ -68,7 +68,7 @@ public class BeanObjectHook implements ObjectHook {
                     if (jsonValue instanceof Map) {
                         log.info("Set nested JSON object to property: " + propertyName);
                         // nested JSON object:
-                        jsonValue = toObject((Map<String, Object>) jsonValue, propertyType);
+                        jsonValue = toObject((Map<String, Object>) jsonValue, propertyType, typeAdapters);
                     }
                     else if (jsonValue instanceof List) {
                         log.info("Set nested JSON array to property: " + propertyName);
@@ -83,10 +83,10 @@ public class BeanObjectHook implements ObjectHook {
                             for (Object element : jsonValueList) {
                                 log.info("Convert each element from JSON value to Java object...");
                                 Object ele = isSimpleValue(element)
-                                        ? toSimpleValue(genericType, element)
+                                        ? toSimpleValue(genericType, element, typeAdapters)
                                                 : ((element instanceof List) && Object.class.equals(genericType) // is List<Object>?
                                                         ? element
-                                                                : toObject((Map<String, Object>) element, genericType)); // convert to List<T>
+                                                                : toObject((Map<String, Object>) element, genericType, typeAdapters)); // convert to List<T>
                                 resultList.add(ele);
                             }
                             if (propertyType.isArray()) {
@@ -110,7 +110,7 @@ public class BeanObjectHook implements ObjectHook {
                     }
                     else {
                         log.info("Set simple JSON value " + jsonValue + " to property: " + propertyName);
-                        jsonValue = toSimpleValue(propertyType, jsonValue);
+                        jsonValue = toSimpleValue(propertyType, jsonValue, typeAdapters);
                     }
                     ps.setProperty(target, jsonValue);
                 }
@@ -132,7 +132,7 @@ public class BeanObjectHook implements ObjectHook {
      * @param element Value object.
      * @return Converted object.
      */
-    Object toSimpleValue(Class<?> genericType, Object element) {
+    Object toSimpleValue(Class<?> genericType, Object element, TypeAdapters typeAdapters) {
         if (element == null) {
             return null;
         }
@@ -144,6 +144,12 @@ public class BeanObjectHook implements ObjectHook {
         Converter converter = SIMPLE_VALUE_CONVERTERS.get(genericType.getName());
         if (converter != null) {
             return converter.convert(element);
+        }
+        if ((element instanceof String) && (typeAdapters != null)) {
+            TypeAdapter<?> adapter = typeAdapters.getTypeAdapter(genericType);
+            if (adapter != null) {
+                return adapter.deserialize((String) element);
+            }
         }
         return element;
     }

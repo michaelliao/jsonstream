@@ -4,13 +4,13 @@ import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Convert JSON object (Map<String, Object>) to JavaBean object, and recursively if necessary.
@@ -18,6 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Michael Liao
  */
 public class BeanObjectHook implements ObjectHook {
+
+    final Log log = LogFactory.getLog(getClass());
 
     // cache for PropertySetters:
     static Map<String, PropertySetters> cachedSetters = new ConcurrentHashMap<String, PropertySetters>();
@@ -31,48 +33,64 @@ public class BeanObjectHook implements ObjectHook {
     @Override
     @SuppressWarnings("unchecked")
     public Object toObject(Map<String, Object> map, Class<?> clazz) {
-        PropertySetters pss = cachedSetters.get(clazz.getName());
+        String beanClassName = clazz.getName();
+        log.info("Convert JSON object to bean: " + beanClassName);
+        PropertySetters pss = cachedSetters.get(beanClassName);
         if (pss == null) {
+            log.info("Load PropertySetters for class: " + beanClassName);
             pss = new PropertySetters(clazz);
-            cachedSetters.put(clazz.getName(), pss);
+            cachedSetters.put(beanClassName, pss);
         }
         try {
+            // create new instance:
             Object target = newInstance(clazz, map);
             for (String propertyName : map.keySet()) {
+                log.info("Try to set property: " + propertyName);
+                // set property from JSON object:
                 PropertySetter ps = pss.getPropertySetter(propertyName);
-                if (ps != null) {
-                    Object value = map.get(propertyName);
-                    if (value instanceof Map) {
+                if (ps == null) {
+                    // there is no property on the bean:
+                    log.info("There is no corresponding property on the bean.");
+                }
+                else {
+                    // json value is Map, List, String, Long, Double, Boolean and null:
+                    Object jsonValue = map.get(propertyName);
+                    Class<?> propertyType = ps.getPropertyType();
+                    if (jsonValue instanceof Map) {
+                        log.info("Set nested JSON object to property: " + propertyName);
                         // nested JSON object:
-                        value = toObject((Map<String, Object>) value, ps.getPropertyType());
+                        jsonValue = toObject((Map<String, Object>) jsonValue, propertyType);
                     }
-                    else if (value instanceof List) {
+                    else if (jsonValue instanceof List) {
+                        log.info("Set nested JSON array to property: " + propertyName);
                         // nested JSON array:
-                        Class<?> propertyType = ps.getPropertyType();
                         if (propertyType.isAssignableFrom(List.class) || propertyType.isArray()) {
                             // set to List<T> or T[]:
                             Class<?> genericType = ps.getGenericType();
-                            List<Object> valueList = (List<Object>) value;
+                            log.info("Nested array element type: " + genericType.getName());
+                            List<Object> jsonValueList = (List<Object>) jsonValue;
                             // convert to List<T>:
-                            List<Object> resultList = new ArrayList<Object>(valueList.size());
-                            for (Object element : valueList) {
-                                Object ele = isSimpleValue(element) ? element : toObject((Map<String, Object>) element, genericType);
+                            List<Object> resultList = new ArrayList<Object>(jsonValueList.size());
+                            for (Object element : jsonValueList) {
+                                log.info("Convert each element from JSON value to Java object...");
+                                Object ele = isSimpleValue(element)
+                                        ? toSimpleValue(genericType, element)
+                                                : toObject((Map<String, Object>) element, genericType);
                                 resultList.add(ele);
                             }
                             if (propertyType.isArray()) {
+                                log.info("Convert to Java array: " + genericType.getName() + "[]...");
                                 // convert List<T> to T[]:
                                 Object array = Array.newInstance(genericType, resultList.size());
                                 int index=  0;
                                 for (Object element : resultList) {
-                                    Array.set(array, index, isSimpleValue(element)
-                                            ? toSimpleValue(genericType, element)
-                                                    : toObject((Map<String, Object>) element, genericType));
+                                    Array.set(array, index, element);
                                     index ++;
                                 }
-                                value = array;
+                                jsonValue = array;
                             }
                             else {
-                                value = resultList;
+                                jsonValue = resultList;
                             }
                         }
                         else {
@@ -80,9 +98,10 @@ public class BeanObjectHook implements ObjectHook {
                         }
                     }
                     else {
-                        value = toSimpleValue(ps.getPropertyType(), value);
+                        log.info("Set simple JSON value " + jsonValue + " to property: " + propertyName);
+                        jsonValue = toSimpleValue(propertyType, jsonValue);
                     }
-                    ps.setProperty(target, value);
+                    ps.setProperty(target, jsonValue);
                 }
             }
             return target;
@@ -174,30 +193,32 @@ public class BeanObjectHook implements ObjectHook {
         SIMPLE_VALUE_CONVERTERS.put(BigDecimal.class.getName(), bigDecimalConveter);
     }
 
-    static final Set<String> SIMPLE_VALUE_NAMES = new HashSet<String>(
-            Arrays.asList("java.lang.String",
-                    "boolean", "java.lang.Boolean",
-                    "long", "java.lang.Long",
-                    "double", "java.lang.Double"));
-
-    boolean isSimpleValue(Object obj) {
-        if (obj == null) {
+    /**
+     * Is the JSON value a simple value? Return true if the JSON value 
+     * is String, Long, Double, Boolean or null.
+     * 
+     * @param jsonObj
+     * @return
+     */
+    boolean isSimpleValue(Object jsonObj) {
+        if (jsonObj == null) {
             return true;
         }
-        String name = obj.getClass().getName();
-        return SIMPLE_VALUE_NAMES.contains(name);
+        return (jsonObj instanceof String)
+                || (jsonObj instanceof Boolean)
+                || (jsonObj instanceof Long)
+                || (jsonObj instanceof Double);
     }
 
     /**
-     * Create a new JavaBean instance.
+     * Create a new JavaBean instance by invoke the default constructor.
      * 
      * @param clazz JavaBean class.
      * @param jsonObject The Json object as Map.
      * @return JavaBean instance.
-     * @throws InstantiationException
-     * @throws IllegalAccessException
+     * @throws Exception
      */
-    protected Object newInstance(Class<?> clazz, Map<String, Object> jsonObject) throws InstantiationException, IllegalAccessException {
+    protected Object newInstance(Class<?> clazz, Map<String, Object> jsonObject) throws Exception {
         return clazz.newInstance();
     }
 

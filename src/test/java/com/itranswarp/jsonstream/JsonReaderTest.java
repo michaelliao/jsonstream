@@ -368,6 +368,7 @@ public class JsonReaderTest {
     public void testParseUseBeanObjectHook() throws Exception {
         String s = "{\"name\":\"Java\", \"avoidMe\": 999, \"shouldIgnore\": \"no\", \"version\":1.8, \"draft\":false, \"level\": 9, \"role\":\"TEACHER\", "
                 + " \"longList\": [10, 20, 30, 40, 50],  "
+                + " \"rawList\": [true, null, 100, [], \"RAW\"],  "
                 + " \"longArray\": [1, 2, 3, 4, 5],  "
                 + " \"intArray\": [-1, -2, -3, -4, -5],  "
                 + " \"stringArray\": [null, \"@@@\"],  "
@@ -440,6 +441,8 @@ class User extends AbstractUser {
     String[] stringArray;
     Collection<Long> longList;
     List<Friend> friends;
+    @SuppressWarnings("rawtypes")
+    List rawList;
 }
 
 class Address {

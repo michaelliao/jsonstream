@@ -75,7 +75,9 @@ public class BeanObjectHook implements ObjectHook {
                                 log.info("Convert each element from JSON value to Java object...");
                                 Object ele = isSimpleValue(element)
                                         ? toSimpleValue(genericType, element)
-                                                : toObject((Map<String, Object>) element, genericType);
+                                                : ((element instanceof List) && Object.class.equals(genericType) // is List<Object>?
+                                                        ? element
+                                                                : toObject((Map<String, Object>) element, genericType)); // convert to List<T>
                                 resultList.add(ele);
                             }
                             if (propertyType.isArray()) {
@@ -146,28 +148,24 @@ public class BeanObjectHook implements ObjectHook {
                 return ((Long) value).intValue();
             }
             throw new NumberFormatException("Cannot convert double to integer.");
-
         };
         Converter shortConveter = (value) -> {
             if (value instanceof Long) {
                 return ((Long) value).shortValue();
             }
             throw new NumberFormatException("Cannot convert double to short.");
-
         };
         Converter byteConveter = (value) -> {
             if (value instanceof Long) {
                 return ((Long) value).byteValue();
             }
             throw new NumberFormatException("Cannot convert double to byte.");
-
         };
         Converter floatConveter = (value) -> {
             if (value instanceof Float) {
                 return ((Float) value).floatValue();
             }
             throw new NumberFormatException("Cannot convert long to float.");
-
         };
         Converter bigIntegerConveter = (value) -> {
             if (value instanceof Long) {

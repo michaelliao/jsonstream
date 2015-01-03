@@ -87,7 +87,7 @@ class PropertySetters {
 
     /**
      * Get generic type of property, e.g. generic type of List<String> is String. 
-     * Return null if no generic type.
+     * Return Class<Object> if no generic type.
      */
     Class<?> getGenericType(Type type) {
         if (type instanceof ParameterizedType) {
@@ -101,7 +101,7 @@ class PropertySetters {
         if (clazz.isArray()) {
             return clazz.getComponentType();
         }
-        return null;
+        return Object.class;
     }
 
     PropertySetter getPropertySetter(String name) {

@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 public class BeanObjectHook implements ObjectHook {
 
     final Log log = LogFactory.getLog(getClass());
+    final ObjectTypeFinder objectTypeFinder;
 
     // cache for PropertySetters:
     static Map<String, PropertySetters> cachedSetters = new ConcurrentHashMap<String, PropertySetters>();
@@ -28,11 +29,19 @@ public class BeanObjectHook implements ObjectHook {
      * Default constructor.
      */
     public BeanObjectHook() {
+        this.objectTypeFinder = (clazz, jsonObject) -> {
+            return clazz;
+        };
+    }
+
+    public BeanObjectHook(ObjectTypeFinder objectTypeFinder) {
+        this.objectTypeFinder = objectTypeFinder;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public Object toObject(Map<String, Object> map, Class<?> clazz) {
+    public Object toObject(Map<String, Object> jsonObjectMap, Class<?> clazz) {
+        clazz = this.objectTypeFinder.find(clazz, jsonObjectMap);
         String beanClassName = clazz.getName();
         log.info("Convert JSON object to bean: " + beanClassName);
         PropertySetters pss = cachedSetters.get(beanClassName);
@@ -43,8 +52,8 @@ public class BeanObjectHook implements ObjectHook {
         }
         try {
             // create new instance:
-            Object target = newInstance(clazz, map);
-            for (String propertyName : map.keySet()) {
+            Object target = newInstance(clazz, jsonObjectMap);
+            for (String propertyName : jsonObjectMap.keySet()) {
                 log.info("Try to set property: " + propertyName);
                 // set property from JSON object:
                 PropertySetter ps = pss.getPropertySetter(propertyName);
@@ -54,7 +63,7 @@ public class BeanObjectHook implements ObjectHook {
                 }
                 else {
                     // json value is Map, List, String, Long, Double, Boolean and null:
-                    Object jsonValue = map.get(propertyName);
+                    Object jsonValue = jsonObjectMap.get(propertyName);
                     Class<?> propertyType = ps.getPropertyType();
                     if (jsonValue instanceof Map) {
                         log.info("Set nested JSON object to property: " + propertyName);

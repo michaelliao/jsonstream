@@ -53,7 +53,7 @@ public class JsonReader {
         Object obj = parse();
         if (obj instanceof Map && !clazz.isAssignableFrom(Map.class)) {
             ObjectHook objectHook = this.objectHook == null ? new BeanObjectHook() : this.objectHook;
-            obj = objectHook.toObject((Map<String, Object>) obj, clazz, typeAdapters);
+            obj = objectHook.toObject(clazz.getSimpleName(), (Map<String, Object>) obj, clazz, typeAdapters);
         }
         return (T) checkExpectedType(obj, clazz);
     }

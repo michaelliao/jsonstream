@@ -1,5 +1,6 @@
 package com.itranswarp.jsonstream;
 
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -8,6 +9,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import com.itranswarp.jsonstream.annotation.Required;
+import com.itranswarp.jsonstream.validator.Validator;
+import com.itranswarp.jsonstream.validator.impl.BooleanValidator;
+import com.itranswarp.jsonstream.validator.impl.IntegerValidator;
+import com.itranswarp.jsonstream.validator.impl.NumberValidator;
+import com.itranswarp.jsonstream.validator.impl.StringValidator;
 
 /**
  * To set value to bean property by conversion if necessary.
@@ -37,15 +45,23 @@ class PropertySetters {
                 Type type = m.getGenericParameterTypes()[0];
                 Class<?> propertyType = getRawType(type);
                 Class<?> genericType = getGenericType(type);
+                boolean isRequired = isRequired(m);
+                Validator<?>[] validators = getValidators(m, propertyType);
                 map.put(propertyName, new PropertySetter() {
+                    public boolean isRequired() {
+                        return isRequired;
+                    }
                     public Class<?> getPropertyType() {
                         return propertyType;
                     }
                     public Class<?> getGenericType() {
                         return genericType;
                     }
-                    public void setProperty(Object obj, Object value) throws Exception {
-                        m.invoke(obj, value);
+                    public void setProperty(Object bean, Object value) throws Exception {
+                        m.invoke(bean, value);
+                    }
+                    public Validator<?>[] getValidators() {
+                        return validators;
                     }
                 });
             }
@@ -58,20 +74,60 @@ class PropertySetters {
                 Type type = f.getGenericType();
                 Class<?> propertyType = getRawType(type);
                 Class<?> genericType = getGenericType(type);
+                boolean isRequired = isRequired(f);
+                Validator<?>[] validators = getValidators(f, propertyType);
                 map.put(propertyName, new PropertySetter() {
+                    public boolean isRequired() {
+                        return isRequired;
+                    }
                     public Class<?> getPropertyType() {
                         return propertyType;
                     }
                     public Class<?> getGenericType() {
                         return genericType;
                     }
-                    public void setProperty(Object obj, Object value) throws Exception {
-                        f.set(obj, value);
+                    public void setProperty(Object bean, Object value) throws Exception {
+                        f.set(bean, value);
+                    }
+                    public Validator<?>[] getValidators() {
+                        return validators;
                     }
                 });
             }
         }
         this.map = map;
+    }
+
+    boolean isRequired(AnnotatedElement ae) {
+        return ae.isAnnotationPresent(Required.class);
+    }
+
+    Validator<?>[] getValidators(AnnotatedElement ae, Class<?> propertyType) {
+        String className = propertyType.getName();
+        switch (className) {
+        case "boolean":
+        case "java.lang.Boolean":
+            return new Validator<?>[] { new BooleanValidator(ae) };
+        case "long":
+        case "int":
+        case "short":
+        case "byte":
+        case "java.lang.Long":
+        case "java.lang.Integer":
+        case "java.lang.Short":
+        case "java.lang.Byte":
+        case "java.math.BigInteger":
+            return new Validator<?>[] { new IntegerValidator(ae) };
+        case "float":
+        case "double":
+        case "java.lang.Float":
+        case "java.lang.Double":
+        case "java.math.BigDecimal":
+            return new Validator<?>[] { new NumberValidator(ae) };
+        default:
+            // all other types are treat as String:
+            return new Validator<?>[] { new StringValidator(ae) };
+        }
     }
 
     /**
@@ -111,6 +167,10 @@ class PropertySetters {
 }
 
 interface PropertySetter {
+
+    boolean isRequired();
+
+    Validator<?>[] getValidators();
 
     Class<?> getGenericType();
 

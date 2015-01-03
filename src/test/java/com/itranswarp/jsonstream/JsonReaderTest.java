@@ -392,7 +392,7 @@ public class JsonReaderTest {
 
     @Test
     public void testParseUseCustomObjectHook() throws Exception {
-        ObjectHook objectHook = (map, clazz, adapters) -> {
+        ObjectHook objectHook = (path, map, clazz, adapters) -> {
             System.out.println("objectHook -> " + clazz);
             User bean = new User();
             bean.name = (String) map.get("name");

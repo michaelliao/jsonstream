@@ -15,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
 import com.itranswarp.jsonstream.validator.Validator;
 
 /**
- * Convert JSON object (Map<String, Object>) to JavaBean object, and recursively if necessary.
+ * Convert JSON object {@code Map<String, Object>} to JavaBean object, and recursively if necessary.
  * 
  * @author Michael Liao
  */
@@ -36,6 +36,11 @@ public class BeanObjectHook implements ObjectHook {
         };
     }
 
+    /**
+     * Constructor with ObjectTypeFinder.
+     * 
+     * @param objectTypeFinder ObjectTypeFinder.
+     */
     public BeanObjectHook(ObjectTypeFinder objectTypeFinder) {
         this.objectTypeFinder = objectTypeFinder;
     }
@@ -139,7 +144,7 @@ public class BeanObjectHook implements ObjectHook {
     }
 
     /**
-     * Convert a simple value object to specific type. e.g. Long -> int, String -> LocalDate.
+     * Convert a simple value object to specific type. e.g. Long to int, String to LocalDate.
      * 
      * @param genericType Object type: int.class, String.class, Float.class, etc.
      * @param element Value object.
@@ -224,8 +229,8 @@ public class BeanObjectHook implements ObjectHook {
      * Is the JSON value a simple value? Return true if the JSON value 
      * is String, Long, Double, Boolean or null.
      * 
-     * @param jsonObj
-     * @return
+     * @param jsonObj JSON object.
+     * @return True if this JSON object is a simple value.
      */
     boolean isSimpleValue(Object jsonObj) {
         if (jsonObj == null) {
@@ -243,7 +248,7 @@ public class BeanObjectHook implements ObjectHook {
      * @param clazz JavaBean class.
      * @param jsonObject The Json object as Map.
      * @return JavaBean instance.
-     * @throws Exception
+     * @throws Exception If any exception occur.
      */
     protected Object newInstance(Class<?> clazz, Map<String, Object> jsonObject) throws Exception {
         return clazz.newInstance();
@@ -251,6 +256,11 @@ public class BeanObjectHook implements ObjectHook {
 
 }
 
+/**
+ * Internal converter used for BeanObjectHook.
+ * 
+ * @author Michael Liao
+ */
 interface Converter {
     Object convert(Object value);
 }

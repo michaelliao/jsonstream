@@ -2,7 +2,7 @@ package com.itranswarp.jsonstream.format;
 
 /**
  * A StringFormat is a way to validate String value by code, used combined with 
- * @Format annotation.
+ * {@code Format.CLASS} annotation.
  * 
  * @author Michael Liao
  */

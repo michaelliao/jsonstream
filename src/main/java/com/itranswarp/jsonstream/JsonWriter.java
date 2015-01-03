@@ -220,8 +220,10 @@ public class JsonWriter {
         }
         Class<? extends Object> beanClass = bean.getClass();
         if (typeAdapters != null) {
+            @SuppressWarnings("rawtypes")
             TypeAdapter adapter = typeAdapters.getTypeAdapter(beanClass);
             if (adapter != null) {
+                @SuppressWarnings("unchecked")
                 String result = adapter.serialize(bean);
                 writeString(result);
                 return;

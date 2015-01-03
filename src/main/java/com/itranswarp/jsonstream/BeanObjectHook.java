@@ -12,6 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.itranswarp.jsonstream.validator.Validator;
+
 /**
  * Convert JSON object (Map<String, Object>) to JavaBean object, and recursively if necessary.
  * 
@@ -40,7 +42,7 @@ public class BeanObjectHook implements ObjectHook {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Object toObject(Map<String, Object> jsonObjectMap, Class<?> clazz, TypeAdapters typeAdapters) {
+    public Object toObject(String path, Map<String, Object> jsonObjectMap, Class<?> clazz, TypeAdapters typeAdapters) {
         clazz = this.objectTypeFinder.find(clazz, jsonObjectMap);
         String beanClassName = clazz.getName();
         log.info("Convert JSON object to bean: " + beanClassName);
@@ -53,13 +55,15 @@ public class BeanObjectHook implements ObjectHook {
         try {
             // create new instance:
             Object target = newInstance(clazz, jsonObjectMap);
-            for (String propertyName : jsonObjectMap.keySet()) {
+            for (String propertyName : pss.map.keySet()) {
                 log.info("Try to set property: " + propertyName);
-                // set property from JSON object:
                 PropertySetter ps = pss.getPropertySetter(propertyName);
-                if (ps == null) {
-                    // there is no property on the bean:
-                    log.info("There is no corresponding property on the bean.");
+                if (! jsonObjectMap.containsKey(propertyName)) {
+                    // there is no property in the JSON object:
+                    log.info("There is no corresponding value in the JSON object.");
+                    if (ps.isRequired()) {
+                        throw new ValidateException("Required", path + "." + propertyName);
+                    }
                 }
                 else {
                     // json value is Map, List, String, Long, Double, Boolean and null:
@@ -68,7 +72,7 @@ public class BeanObjectHook implements ObjectHook {
                     if (jsonValue instanceof Map) {
                         log.info("Set nested JSON object to property: " + propertyName);
                         // nested JSON object:
-                        jsonValue = toObject((Map<String, Object>) jsonValue, propertyType, typeAdapters);
+                        jsonValue = toObject(path + "." + propertyName, (Map<String, Object>) jsonValue, propertyType, typeAdapters);
                     }
                     else if (jsonValue instanceof List) {
                         log.info("Set nested JSON array to property: " + propertyName);
@@ -80,20 +84,22 @@ public class BeanObjectHook implements ObjectHook {
                             List<Object> jsonValueList = (List<Object>) jsonValue;
                             // convert to List<T>:
                             List<Object> resultList = new ArrayList<Object>(jsonValueList.size());
+                            int index = 0;
                             for (Object element : jsonValueList) {
                                 log.info("Convert each element from JSON value to Java object...");
                                 Object ele = isSimpleValue(element)
                                         ? toSimpleValue(genericType, element, typeAdapters)
                                                 : ((element instanceof List) && Object.class.equals(genericType) // is List<Object>?
                                                         ? element
-                                                                : toObject((Map<String, Object>) element, genericType, typeAdapters)); // convert to List<T>
+                                                                : toObject(path + "." + propertyName + "[" + index + "]", (Map<String, Object>) element, genericType, typeAdapters)); // convert to List<T>
                                 resultList.add(ele);
+                                index ++;
                             }
                             if (propertyType.isArray()) {
                                 log.info("Convert to Java array: " + genericType.getName() + "[]...");
                                 // convert List<T> to T[]:
                                 Object array = Array.newInstance(genericType, resultList.size());
-                                int index=  0;
+                                index = 0;
                                 for (Object element : resultList) {
                                     Array.set(array, index, element);
                                     index ++;
@@ -109,6 +115,13 @@ public class BeanObjectHook implements ObjectHook {
                         }
                     }
                     else {
+                        Validator<?>[] validators = ps.getValidators();
+                        if (validators != null && validators.length > 0) {
+                            log.info("Validator simple value: " + jsonValue);
+                            for (@SuppressWarnings("rawtypes") Validator validator : validators) {
+                                validator.validate(jsonValue, path, propertyName);
+                            }
+                        }
                         log.info("Set simple JSON value " + jsonValue + " to property: " + propertyName);
                         jsonValue = toSimpleValue(propertyType, jsonValue, typeAdapters);
                     }
@@ -126,7 +139,7 @@ public class BeanObjectHook implements ObjectHook {
     }
 
     /**
-     * Convert a simple value object to specific type.
+     * Convert a simple value object to specific type. e.g. Long -> int, String -> LocalDate.
      * 
      * @param genericType Object type: int.class, String.class, Float.class, etc.
      * @param element Value object.
@@ -136,6 +149,7 @@ public class BeanObjectHook implements ObjectHook {
         if (element == null) {
             return null;
         }
+        log.info("Convert from " + element.getClass().getName() + " to " + genericType.getName());
         if (genericType.isEnum() && (element instanceof String)) {
             @SuppressWarnings({ "unchecked", "rawtypes" })
             Enum<?> enumValue = Enum.valueOf((Class<? extends Enum>) genericType, (String) element);
@@ -177,8 +191,8 @@ public class BeanObjectHook implements ObjectHook {
             throw new NumberFormatException("Cannot convert double to byte.");
         };
         Converter floatConveter = (value) -> {
-            if (value instanceof Float) {
-                return ((Float) value).floatValue();
+            if (value instanceof Double) {
+                return ((Double) value).floatValue();
             }
             throw new NumberFormatException("Cannot convert long to float.");
         };

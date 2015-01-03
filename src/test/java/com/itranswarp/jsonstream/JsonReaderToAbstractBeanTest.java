@@ -54,22 +54,19 @@ public class JsonReaderToAbstractBeanTest {
                 + "   {\"type\": \"Husky\", \"name\": \"Haha\", \"age\": 3, \"clever\": 50 }, "
                 + "   {\"type\": \"Bulldog\", \"name\": \"Blue\", \"age\": 2, \"weight\": 12 } "
                 + " ] }";
-        ObjectTypeFinder typeFinder = new ObjectTypeFinder() {
-            @Override
-            public Class<?> find(Class<?> clazz,
-                    Map<String, Object> jsonObject) {
-                if (AbstractDog.class.equals(clazz)) {
-                    Object value = jsonObject.get("type");
-                    if ("Husky".equals(value)) {
-                        return Husky.class;
-                    }
-                    if ("Bulldog".equals(value)) {
-                        return Bulldog.class;
-                    }
-                    throw new RuntimeException("Cannot detect object type for AbstractDog.");
+        ObjectTypeFinder typeFinder = (clazz, jsonObject) -> {
+            if (AbstractDog.class.equals(clazz)) {
+                Object value = jsonObject.get("type");
+                if ("Husky".equals(value)) {
+                    return Husky.class;
                 }
-                return clazz;
-            }};
+                if ("Bulldog".equals(value)) {
+                    return Bulldog.class;
+                }
+                throw new RuntimeException("Cannot detect object type for AbstractDog.");
+            }
+            return clazz;
+        };
         BeanObjectHook beanObjectHook = new BeanObjectHook(typeFinder);
         JsonReader js = new JsonBuilder().useObjectHook(beanObjectHook).createReader(s);
         PetOwner owner = js.parse(PetOwner.class);
@@ -85,6 +82,24 @@ public class JsonReaderToAbstractBeanTest {
         assertEquals(12, bulldog.weight);
     }
 
+    @Test
+    public void testModifyJsonMapWhenUseObjectTypeFinder() throws Exception {
+        String s = "{ \"type\": \"Husky\", \"name\": \"Haha\", \"age\": 3, \"clever\": 50 }";
+        ObjectTypeFinder typeFinder = (clazz, jsonObject) -> {
+            if (AbstractDog.class.equals(clazz)) {
+                // modify JSON map is not recommended:
+                jsonObject.put("clever", 99L);
+                return Husky.class;
+            }
+            return clazz;
+        };
+        BeanObjectHook beanObjectHook = new BeanObjectHook(typeFinder);
+        JsonReader js = new JsonBuilder().useObjectHook(beanObjectHook).createReader(s);
+        Husky husky = (Husky) js.parse(AbstractDog.class);
+        assertEquals("Haha", husky.name);
+        assertEquals(3, husky.age);
+        assertEquals(99, husky.clever);
+    }
 }
 
 class PetOwner {

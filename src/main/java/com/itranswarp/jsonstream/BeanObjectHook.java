@@ -231,3 +231,6 @@ public class BeanObjectHook implements ObjectHook {
 
 }
 
+interface Converter {
+    Object convert(Object value);
+}

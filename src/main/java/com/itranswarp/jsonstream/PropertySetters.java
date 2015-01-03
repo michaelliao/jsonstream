@@ -110,10 +110,6 @@ class PropertySetters {
 
 }
 
-interface Converter {
-    Object convert(Object value);
-}
-
 interface PropertySetter {
 
     Class<?> getGenericType();

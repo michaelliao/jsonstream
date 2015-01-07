@@ -301,6 +301,14 @@ public class JsonWriter {
             writeNumber((Number) obj);
             return;
         }
+        if (obj instanceof Character) {
+            writeString(String.valueOf(((Character) obj).charValue()));
+            return;
+        }
+        if (obj instanceof JsonSerializable) {
+            writeMap(((JsonSerializable) obj).toJson(), typeAdapters, depth);
+            return;
+        }
         Class<?> clazz = obj.getClass();
         if (clazz.isEnum()) {
             writeEnum((Enum<?>) obj);

@@ -1,5 +1,12 @@
 Release Notes
 
+1.0.1 (2015-01-07)
+==================
+
+Add JsonSerializable support, allow to serialize object to custom definition.
+
+Bugfix for serializing char.
+
 1.0 (2015-01-06)
 ================
 

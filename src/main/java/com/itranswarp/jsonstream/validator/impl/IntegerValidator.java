@@ -4,7 +4,7 @@ import java.lang.reflect.AnnotatedElement;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.itranswarp.jsonstream.ValidateException;
+import com.itranswarp.jsonstream.JsonValidateException;
 import com.itranswarp.jsonstream.annotation.EnumInteger;
 import com.itranswarp.jsonstream.annotation.ExclusiveMaximum;
 import com.itranswarp.jsonstream.annotation.ExclusiveMinimum;
@@ -63,33 +63,33 @@ public class IntegerValidator implements Validator<Long> {
 	public void validate(Long obj, String path, String name) {
 		String fullpath = path + "." + name;
 		if (required && obj == null) {
-			throw new ValidateException("Required", fullpath);
+			throw new JsonValidateException("Required", fullpath);
 		}
 		if (obj == null) {
 			return;
 		}
 		long value = obj.longValue();
 		if ((multipleOf != null) && (value % multipleOf > 0)) {
-			throw new ValidateException("MultipleOf", fullpath);
+			throw new JsonValidateException("MultipleOf", fullpath);
 		}
 		if (minimum != null) {
 			if (value < minimum) {
-				throw new ValidateException("Minimum", fullpath);
+				throw new JsonValidateException("Minimum", fullpath);
 			}
 			if (exclusiveMinimum && (value == minimum)) {
-				throw new ValidateException("ExclusiveMinimum", fullpath);
+				throw new JsonValidateException("ExclusiveMinimum", fullpath);
 			}
 		}
 		if (maximum != null) {
 			if (value > maximum) {
-				throw new ValidateException("Maximum", fullpath);
+				throw new JsonValidateException("Maximum", fullpath);
 			}
 			if (exclusiveMaximum && (value == maximum)) {
-				throw new ValidateException("ExclusiveMaximum", fullpath);
+				throw new JsonValidateException("ExclusiveMaximum", fullpath);
 			}
 		}
 		if (enums != null && !enums.contains(obj)) {
-			throw new ValidateException("Enum", fullpath);
+			throw new JsonValidateException("Enum", fullpath);
 		}
 	}
 

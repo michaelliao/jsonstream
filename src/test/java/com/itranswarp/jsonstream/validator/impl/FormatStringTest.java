@@ -7,7 +7,7 @@ import com.itranswarp.jsonstream.annotation.Format;
 import com.itranswarp.jsonstream.format.Email;
 import com.itranswarp.jsonstream.format.LowerCase;
 import com.itranswarp.jsonstream.validator.impl.StringValidator;
-import com.itranswarp.jsonstream.ValidateException;
+import com.itranswarp.jsonstream.JsonValidateException;
 
 public class FormatStringTest {
 
@@ -25,7 +25,7 @@ public class FormatStringTest {
         formatValidator.validate("michael@itranswarp.com", "path", "value");
     }
 
-	@Test(expected=ValidateException.class)
+	@Test(expected=JsonValidateException.class)
     public void testEmailIsOkButLowerCaseFailed() {
         formatValidator.validate("Michael@itranswarp.com", "path", "value");
     }

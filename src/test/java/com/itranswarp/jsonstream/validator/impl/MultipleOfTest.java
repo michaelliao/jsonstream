@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import com.itranswarp.jsonstream.annotation.MultipleOf;
 import com.itranswarp.jsonstream.validator.impl.IntegerValidator;
-import com.itranswarp.jsonstream.ValidateException;
+import com.itranswarp.jsonstream.JsonValidateException;
 
 public class MultipleOfTest {
 
@@ -30,7 +30,7 @@ public class MultipleOfTest {
 		multipleOfValidator.validate(null, "path", "value");
 	}
 
-	@Test(expected=ValidateException.class)
+	@Test(expected=JsonValidateException.class)
 	public void testNotMultipleOf10() {
 		multipleOfValidator.validate(55L, "path", "value");
 	}

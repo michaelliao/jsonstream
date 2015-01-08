@@ -67,7 +67,7 @@ public class BeanObjectMapper implements ObjectMapper {
                     // there is no property in the JSON object:
                     log.info("There is no corresponding value in the JSON object.");
                     if (ps.isRequired()) {
-                        throw new ValidateException("Required", path + "." + propertyName);
+                        throw new JsonValidateException("Required", path + "." + propertyName);
                     }
                 }
                 else {

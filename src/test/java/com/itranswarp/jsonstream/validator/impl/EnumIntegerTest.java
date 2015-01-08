@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.itranswarp.jsonstream.annotation.EnumInteger;
-import com.itranswarp.jsonstream.ValidateException;
+import com.itranswarp.jsonstream.JsonValidateException;
 import com.itranswarp.jsonstream.validator.impl.IntegerValidator;
 
 public class EnumIntegerTest {
@@ -23,7 +23,7 @@ public class EnumIntegerTest {
 		enumValidator.validate(35L, "path", "value");
 	}
 
-	@Test(expected=ValidateException.class)
+	@Test(expected=JsonValidateException.class)
 	public void testNotContainsEnumValue() {
 		enumValidator.validate(11L, "path", "value");
 	}

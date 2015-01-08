@@ -5,7 +5,7 @@ package com.itranswarp.jsonstream;
  * 
  * @author Michael Liao
  */
-public class JsonBindException extends RuntimeException {
+public class JsonBindException extends JsonException {
 
     /**
      * Create JsonBindException with message and nested exception.

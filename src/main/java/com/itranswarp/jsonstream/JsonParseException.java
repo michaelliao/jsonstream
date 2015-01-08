@@ -1,11 +1,11 @@
 package com.itranswarp.jsonstream;
 
 /**
- * Exception when parse JSON.
+ * Exception when parse invalid JSON or encountered an IOException.
  * 
  * @author Michael Liao
  */
-public class JsonParseException extends RuntimeException {
+public class JsonParseException extends JsonException {
 
     private final int errorIndex;
 

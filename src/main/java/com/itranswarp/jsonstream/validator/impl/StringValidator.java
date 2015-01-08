@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.itranswarp.jsonstream.ValidateException;
+import com.itranswarp.jsonstream.JsonValidateException;
 import com.itranswarp.jsonstream.annotation.EnumString;
 import com.itranswarp.jsonstream.annotation.Format;
 import com.itranswarp.jsonstream.annotation.MaxLength;
@@ -67,26 +67,26 @@ public class StringValidator implements Validator<String> {
 	public void validate(String obj, String path, String name) {
 		String fullpath = path + "." + name;
 		if (required && obj == null) {
-			throw new ValidateException("Required", fullpath);
+			throw new JsonValidateException("Required", fullpath);
 		}
 		if (obj == null) {
 			return;
 		}
 		if ((minLength != null) && (obj.length() < minLength)) {
-			throw new ValidateException("MinLength", fullpath);
+			throw new JsonValidateException("MinLength", fullpath);
 		}
 		if ((maxLength != null) && (obj.length() > maxLength)) {
-			throw new ValidateException("MaxLength", fullpath);
+			throw new JsonValidateException("MaxLength", fullpath);
 		}
 		if ((pattern != null) && !pattern.matcher(obj).matches()) {
-			throw new ValidateException("Pattern", fullpath);
+			throw new JsonValidateException("Pattern", fullpath);
 		}
 		if (enums != null && !enums.contains(obj)) {
-			throw new ValidateException("Enum", fullpath);
+			throw new JsonValidateException("Enum", fullpath);
 		}
 		for (StringFormat sf : formats) {
 		    if (! sf.validate(obj)) {
-		        throw new ValidateException("Format", fullpath);
+		        throw new JsonValidateException("Format", fullpath);
 		    }
 		}
 	}

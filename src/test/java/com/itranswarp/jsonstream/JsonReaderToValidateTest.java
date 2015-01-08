@@ -50,7 +50,7 @@ public class JsonReaderToValidateTest {
         assertEquals("A00001", order.productId);
     }
 
-    @Test(expected=ValidateException.class)
+    @Test(expected=JsonValidateException.class)
     public void testValidateFailedForRequiredProductIdIsNull() throws Exception {
         String jsonAddress = "{"
                 + " \"name\":\"Bob\", "
@@ -74,7 +74,7 @@ public class JsonReaderToValidateTest {
         assertEquals("A00001", order.productId);
     }
 
-    @Test(expected=ValidateException.class)
+    @Test(expected=JsonValidateException.class)
     public void testValidateFailedForRequiredProductIdIsMissing() throws Exception {
         String jsonAddress = "{"
                 + " \"name\":\"Bob\", "
@@ -97,7 +97,7 @@ public class JsonReaderToValidateTest {
         assertEquals("A00001", order.productId);
     }
 
-    @Test(expected=ValidateException.class)
+    @Test(expected=JsonValidateException.class)
     public void testValidateFailedForNumberIs0() throws Exception {
         String jsonAddress = "{"
                 + " \"name\":\"Bob\", "
@@ -121,7 +121,7 @@ public class JsonReaderToValidateTest {
         assertEquals("A00001", order.productId);
     }
 
-    @Test(expected=ValidateException.class)
+    @Test(expected=JsonValidateException.class)
     public void testValidateFailedForNumberIsOutOfMax() throws Exception {
         String jsonAddress = "{"
                 + " \"name\":\"Bob\", "
@@ -145,7 +145,7 @@ public class JsonReaderToValidateTest {
         assertEquals("A00001", order.productId);
     }
 
-    @Test(expected=ValidateException.class)
+    @Test(expected=JsonValidateException.class)
     public void testValidateFailedForDateFormatIsInvalid() throws Exception {
         String jsonAddress = "{"
                 + " \"name\":\"Bob\", "
@@ -169,7 +169,7 @@ public class JsonReaderToValidateTest {
         assertEquals("A00001", order.productId);
     }
 
-    @Test(expected=ValidateException.class)
+    @Test(expected=JsonValidateException.class)
     public void testValidateFailedForAddressIsMissing() throws Exception {
         String jsonOrder = "{"
                 + " \"productId\":\"A00001\", "
@@ -211,7 +211,7 @@ public class JsonReaderToValidateTest {
             js.parse(ProductOrder.class);
             fail("Not caught ValidateException.");
         }
-        catch (ValidateException e) {
+        catch (JsonValidateException e) {
             assertEquals("Format", e.getCode());
             assertEquals("ProductOrder.address.zipcode", e.getPath());
         }

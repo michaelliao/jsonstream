@@ -8,7 +8,7 @@ import com.itranswarp.jsonstream.annotation.ExclusiveMinimum;
 import com.itranswarp.jsonstream.annotation.MaximumInteger;
 import com.itranswarp.jsonstream.annotation.MinimumInteger;
 import com.itranswarp.jsonstream.validator.impl.IntegerValidator;
-import com.itranswarp.jsonstream.ValidateException;
+import com.itranswarp.jsonstream.JsonValidateException;
 
 public class ExclusiveTest {
 
@@ -28,12 +28,12 @@ public class ExclusiveTest {
 		minValidator.validate(11L, "path", "value");
 	}
 
-	@Test(expected=ValidateException.class)
+	@Test(expected=JsonValidateException.class)
 	public void testEqualToMin() {
 		minValidator.validate(10L, "path", "value");
 	}
 
-	@Test(expected=ValidateException.class)
+	@Test(expected=JsonValidateException.class)
 	public void testLessThanMin() {
 		minValidator.validate(9L, "path", "value");
 	}
@@ -43,12 +43,12 @@ public class ExclusiveTest {
 		maxValidator.validate(99L, "path", "value");
 	}
 
-	@Test(expected=ValidateException.class)
+	@Test(expected=JsonValidateException.class)
 	public void testEqualToMax() {
 		maxValidator.validate(100L, "path", "value");
 	}
 
-	@Test(expected=ValidateException.class)
+	@Test(expected=JsonValidateException.class)
 	public void testGreaterThanMax() {
 		maxValidator.validate(101L, "path", "value");
 	}

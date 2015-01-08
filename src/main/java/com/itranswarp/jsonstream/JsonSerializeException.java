@@ -5,7 +5,7 @@ package com.itranswarp.jsonstream;
  * 
  * @author Michael Liao
  */
-public class JsonSerializeException extends RuntimeException {
+public class JsonSerializeException extends JsonException {
 
     /**
      * Construct a JsonSerializeException.

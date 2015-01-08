@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import com.itranswarp.jsonstream.annotation.EnumString;
 import com.itranswarp.jsonstream.validator.impl.StringValidator;
-import com.itranswarp.jsonstream.ValidateException;
+import com.itranswarp.jsonstream.JsonValidateException;
 
 public class EnumStringTest {
 
@@ -23,7 +23,7 @@ public class EnumStringTest {
 		enumValidator.validate(".org", "path", "value");
 	}
 
-	@Test(expected=ValidateException.class)
+	@Test(expected=JsonValidateException.class)
 	public void testNotContainsEnumValue() {
 		enumValidator.validate(".gov", "path", "value");
 	}

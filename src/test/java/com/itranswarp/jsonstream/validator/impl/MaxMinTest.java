@@ -9,7 +9,7 @@ import com.itranswarp.jsonstream.annotation.MinimumInteger;
 import com.itranswarp.jsonstream.annotation.MinimumNumber;
 import com.itranswarp.jsonstream.validator.impl.IntegerValidator;
 import com.itranswarp.jsonstream.validator.impl.NumberValidator;
-import com.itranswarp.jsonstream.ValidateException;
+import com.itranswarp.jsonstream.JsonValidateException;
 
 public class MaxMinTest {
 
@@ -40,7 +40,7 @@ public class MaxMinTest {
 		minIntegerValidator.validate(10L, "path", "value");
 	}
 
-	@Test(expected=ValidateException.class)
+	@Test(expected=JsonValidateException.class)
 	public void testLessThanMinInteger() {
 		minIntegerValidator.validate(9L, "path", "value");
 	}
@@ -55,7 +55,7 @@ public class MaxMinTest {
 		maxIntegerValidator.validate(100L, "path", "value");
 	}
 
-	@Test(expected=ValidateException.class)
+	@Test(expected=JsonValidateException.class)
 	public void testGreaterThanMaxInteger() {
 		maxIntegerValidator.validate(101L, "path", "value");
 	}
@@ -70,7 +70,7 @@ public class MaxMinTest {
 		minNumberValidator.validate(10.5, "path", "value");
 	}
 
-	@Test(expected=ValidateException.class)
+	@Test(expected=JsonValidateException.class)
 	public void testLessThanMinNumber() {
 		minNumberValidator.validate(10.4, "path", "value");
 	}
@@ -85,7 +85,7 @@ public class MaxMinTest {
 		maxNumberValidator.validate(100.5, "path", "value");
 	}
 
-	@Test(expected=ValidateException.class)
+	@Test(expected=JsonValidateException.class)
 	public void testGreaterThanMaxNumber() {
 		maxNumberValidator.validate(100.6, "path", "value");
 	}

@@ -27,7 +27,7 @@ public class JsonReaderToRegisteredTypeTest {
         assertEquals(LocalTime.of(7, 10), hotel.breakfast);
     }
 
-    @Test(expected=ValidateException.class)
+    @Test(expected=JsonValidateException.class)
     public void testUseTypeAdapterWithValidation() throws Exception {
         String s = "{ \"rooms\": 1, \"start\": \"2015-A1-01\", \"end\": \"2015-01-05\", \"breakfast\": \"07:10\" }";
         JsonReader js = new JsonBuilder()

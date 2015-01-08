@@ -5,18 +5,18 @@ package com.itranswarp.jsonstream;
  * 
  * @author Michael Liao
  */
-public class ValidateException extends RuntimeException {
+public class JsonValidateException extends JsonException {
 
 	private final String code;
 	private final String path;
 
-	public ValidateException(String code, String path) {
+	public JsonValidateException(String code, String path) {
 		super("Validation failed: " + path + ", not satisfied by: " + code);
 		this.code = code;
 		this.path = path;
 	}
 
-	public ValidateException(String code, String path, Throwable cause) {
+	public JsonValidateException(String code, String path, Throwable cause) {
 		super("Validation failed: " + path + ", not satisfied by: " + code, cause);
 		this.code = code;
 		this.path = path;

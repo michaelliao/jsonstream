@@ -7,7 +7,7 @@ import com.itranswarp.jsonstream.annotation.Required;
 import com.itranswarp.jsonstream.validator.impl.IntegerValidator;
 import com.itranswarp.jsonstream.validator.impl.NumberValidator;
 import com.itranswarp.jsonstream.validator.impl.StringValidator;
-import com.itranswarp.jsonstream.ValidateException;
+import com.itranswarp.jsonstream.JsonValidateException;
 
 public class RequiredTest {
 
@@ -29,7 +29,7 @@ public class RequiredTest {
 		integerValidator.validate(1L, "path", "value");
 	}
 
-	@Test(expected=ValidateException.class)
+	@Test(expected=JsonValidateException.class)
 	public void testRequiredLongButNull() {
 		integerValidator.validate(null, "path", "value");
 	}
@@ -49,7 +49,7 @@ public class RequiredTest {
 		stringValidator.validate("", "path", "value");
 	}
 
-	@Test(expected=ValidateException.class)
+	@Test(expected=JsonValidateException.class)
 	public void testRequiredStringButNull() {
 		stringValidator.validate(null, "path", "value");
 	}

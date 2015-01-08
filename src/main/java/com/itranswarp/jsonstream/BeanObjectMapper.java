@@ -19,7 +19,7 @@ import com.itranswarp.jsonstream.validator.Validator;
  * 
  * @author Michael Liao
  */
-public class BeanObjectHook implements ObjectHook {
+public class BeanObjectMapper implements ObjectMapper {
 
     final Log log = LogFactory.getLog(getClass());
     final ObjectTypeFinder objectTypeFinder;
@@ -30,7 +30,7 @@ public class BeanObjectHook implements ObjectHook {
     /**
      * Default constructor.
      */
-    public BeanObjectHook() {
+    public BeanObjectMapper() {
         this.objectTypeFinder = (clazz, jsonObject) -> {
             return clazz;
         };
@@ -41,7 +41,7 @@ public class BeanObjectHook implements ObjectHook {
      * 
      * @param objectTypeFinder ObjectTypeFinder.
      */
-    public BeanObjectHook(ObjectTypeFinder objectTypeFinder) {
+    public BeanObjectMapper(ObjectTypeFinder objectTypeFinder) {
         this.objectTypeFinder = objectTypeFinder;
     }
 

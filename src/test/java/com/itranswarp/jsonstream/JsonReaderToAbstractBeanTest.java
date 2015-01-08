@@ -67,7 +67,7 @@ public class JsonReaderToAbstractBeanTest {
             }
             return clazz;
         };
-        BeanObjectHook beanObjectHook = new BeanObjectHook(typeFinder);
+        BeanObjectMapper beanObjectHook = new BeanObjectMapper(typeFinder);
         JsonReader js = new JsonBuilder().useObjectHook(beanObjectHook).createReader(s);
         PetOwner owner = js.parse(PetOwner.class);
         assertEquals("Bob", owner.name);
@@ -93,7 +93,7 @@ public class JsonReaderToAbstractBeanTest {
             }
             return clazz;
         };
-        BeanObjectHook beanObjectHook = new BeanObjectHook(typeFinder);
+        BeanObjectMapper beanObjectHook = new BeanObjectMapper(typeFinder);
         JsonReader js = new JsonBuilder().useObjectHook(beanObjectHook).createReader(s);
         Husky husky = (Husky) js.parse(AbstractDog.class);
         assertEquals("Haha", husky.name);

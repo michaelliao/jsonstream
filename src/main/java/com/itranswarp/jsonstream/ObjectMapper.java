@@ -7,7 +7,7 @@ import java.util.Map;
  * 
  * @author Michael Liao
  */
-public interface ObjectHook {
+public interface ObjectMapper {
 
     /**
      * Convert {@code Map<String, Object>} to Java bean.

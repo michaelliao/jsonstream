@@ -16,11 +16,11 @@ public class JsonReader {
     final TokenReader reader;
     final JsonObjectFactory jsonObjectFactory;
     final JsonArrayFactory jsonArrayFactory;
-    final ObjectHook objectHook;
+    final ObjectMapper objectHook;
     final TypeAdapters typeAdapters;
 
     public JsonReader(Reader reader, JsonObjectFactory jsonObjectFactory,
-            JsonArrayFactory jsonArrayFactory, ObjectHook objectHook, TypeAdapters typeAdapters) {
+            JsonArrayFactory jsonArrayFactory, ObjectMapper objectHook, TypeAdapters typeAdapters) {
         this.reader = new TokenReader(new CharReader(reader));
         this.jsonObjectFactory = jsonObjectFactory != null ? jsonObjectFactory
                 : () -> {
@@ -52,7 +52,7 @@ public class JsonReader {
     public <T> T parse(Class<T> clazz) throws IOException {
         Object obj = parse();
         if (obj instanceof Map && !clazz.isAssignableFrom(Map.class)) {
-            ObjectHook objectHook = this.objectHook == null ? new BeanObjectHook() : this.objectHook;
+            ObjectMapper objectHook = this.objectHook == null ? new BeanObjectMapper() : this.objectHook;
             obj = objectHook.toObject(clazz.getSimpleName(), (Map<String, Object>) obj, clazz, typeAdapters);
         }
         return (T) checkExpectedType(obj, clazz);

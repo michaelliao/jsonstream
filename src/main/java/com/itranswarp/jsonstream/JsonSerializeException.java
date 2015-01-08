@@ -7,6 +7,11 @@ package com.itranswarp.jsonstream;
  */
 public class JsonSerializeException extends RuntimeException {
 
+    /**
+     * Construct a JsonSerializeException.
+     * 
+     * @param message The exception message.
+     */
     public JsonSerializeException(String message) {
         super(message);
     }

@@ -16,7 +16,7 @@ public class JsonBuilder {
 
     JsonObjectFactory jsonObjectFactory = null;
     JsonArrayFactory jsonArrayFactory = null;
-    ObjectHook objectHook = null;
+    ObjectMapper objectMapper = null;
     TypeAdapters typeAdapters = new TypeAdapters();
 
     public JsonBuilder() {
@@ -37,8 +37,8 @@ public class JsonBuilder {
         return this;
     }
 
-    public JsonBuilder useObjectHook(ObjectHook objectHook) {
-        this.objectHook = objectHook;
+    public JsonBuilder useObjectHook(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
         return this;
     }
 
@@ -47,7 +47,7 @@ public class JsonBuilder {
     }
 
     public JsonReader createReader(Reader reader) {
-        return new JsonReader(reader, jsonObjectFactory, jsonArrayFactory, objectHook, typeAdapters);
+        return new JsonReader(reader, jsonObjectFactory, jsonArrayFactory, objectMapper, typeAdapters);
     }
 
     public JsonReader createReader(InputStream input) {

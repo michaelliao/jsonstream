@@ -3,10 +3,10 @@ jsonstream
 
 A fast streaming parser for JSON.
 
-Example:
+Features:
 
-```
-String jsonString = "{\"key\": \"value\"}";
-JsonReader jsonReader = JsonBuilder().createReader(jsonString);
-Map<String, Object> result = jsonReader.parse();
-```
+* Parse or serialize JSON string to/from Java object;
+* Validate JSON when converting to JavaBean;
+* Customize type support;
+* Customize serialization;
+* Simple API.

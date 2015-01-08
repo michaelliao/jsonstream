@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import com.itranswarp.jsonstream.adapter.DateTypeAdapter;
 import com.itranswarp.jsonstream.adapter.TimeTypeAdapter;
-import com.itranswarp.jsonstream.annotation.Pattern;
 
 public class JsonWriterToRegisteredTypeTest {
 

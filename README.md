@@ -10,3 +10,5 @@ Features:
 * Customize type support;
 * Customize serialization;
 * Simple API.
+
+Read more at [http://jsonstream.itranswarp.com](http://jsonstream.itranswarp.com)

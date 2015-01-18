@@ -5,7 +5,7 @@
 
 	<groupId>com.itranswarp</groupId>
 	<artifactId>jsonstream</artifactId>
-	<version>1.0.2</version>
+	<version>1.0.3</version>
 	<packaging>jar</packaging>
 
 	<name>jsonstream</name>
@@ -24,7 +24,7 @@
 			<name>Michael Liao</name>
 			<email>askxuefeng@gmail.com</email>
 			<organization>iTranswarp</organization>
-			<organizationUrl>http://www.itranswarp.com</organizationUrl>
+			<organizationUrl>http://jsonstream.itranswarp.com</organizationUrl>
 		</developer>
 	</developers>
 

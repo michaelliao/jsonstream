@@ -3,6 +3,7 @@ package com.itranswarp.jsonstream;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +43,23 @@ public class JsonWriterTest {
         JsonWriter jw = prepareJsonWriter();
         jw.write(123.456);
         assertEquals("123.456", jw.toString());
+    }
+
+    @Test
+    public void testWriteMap() throws Exception {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("key", 123456);
+        JsonWriter jw = prepareJsonWriter();
+        jw.write(map);
+        assertEquals("{\"key\":123456}", jw.toString());
+    }
+
+    @Test(expected=ClassCastException.class)
+    public void testWriteMapButKeyIsInvalid() throws Exception {
+        Map<Object, Object> map = new HashMap<Object, Object>();
+        map.put(123, "456");
+        JsonWriter jw = prepareJsonWriter();
+        jw.write(map);
     }
 
     @Test

@@ -305,6 +305,10 @@ public class JsonWriter {
             writeString(String.valueOf(((Character) obj).charValue()));
             return;
         }
+        if (obj instanceof Map) {
+            writeMap((Map<String, Object>) obj, typeAdapters, depth);
+            return;
+        }
         if (obj instanceof JsonSerializable) {
             writeMap(((JsonSerializable) obj).toJson(), typeAdapters, depth);
             return;

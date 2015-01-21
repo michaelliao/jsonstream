@@ -1,5 +1,12 @@
 Release Notes
 
+1.0.3 (2015-01-21)
+==================
+
+Add createWriter(OutputStream) in JsonBuilder.
+
+Fix serialize Map.
+
 1.0.2 (2015-01-08)
 ==================
 

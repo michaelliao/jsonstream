@@ -1,6 +1,7 @@
 package com.itranswarp.jsonstream;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -251,9 +252,17 @@ public class BeanObjectMapper implements ObjectMapper {
      * @throws Exception If any exception occur.
      */
     protected Object newInstance(Class<?> clazz, Map<String, Object> jsonObject) throws Exception {
-        return clazz.newInstance();
+        String key = clazz.getName();
+        Constructor<?> cons = constructors.get(key);
+        if (cons == null) {
+            cons = clazz.getDeclaredConstructor();
+            cons.setAccessible(true);
+            constructors.put(key, cons);
+        }
+        return cons.newInstance();
     }
 
+    Map<String, Constructor<?>> constructors = new ConcurrentHashMap<String, Constructor<?>>();
 }
 
 /**

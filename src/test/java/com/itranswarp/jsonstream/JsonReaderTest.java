@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import com.google.gson.GsonBuilder;
 import com.itranswarp.jsonstream.annotation.JsonIgnore;
+import com.itranswarp.jsonstream.bean.NonPublicBean;
 
 public class JsonReaderTest {
 
@@ -365,7 +366,7 @@ public class JsonReaderTest {
     }
 
     @Test
-    public void testParseUseBeanObjectHook() throws Exception {
+    public void testParseUseBeanObjectMapper() throws Exception {
         String s = "{\"name\":\"Java\", \"avoidMe\": 999, \"shouldIgnore\": \"no\", \"version\":1.8, \"draft\":false, \"level\": 9, \"role\":\"TEACHER\", "
                 + " \"longList\": [10, 20, 30, 40, 50],  "
                 + " \"rawList\": [true, null, 100, [], \"RAW\"],  "
@@ -387,12 +388,20 @@ public class JsonReaderTest {
         assertTrue(bean.address instanceof Address);
         assertEquals("No.1 West Road", bean.address.street);
         assertEquals("100101", bean.address.zipcode);
-        System.out.println("User -> JSON: " + prepareStandardJson(bean));
     }
 
     @Test
-    public void testParseUseCustomObjectHook() throws Exception {
-        ObjectMapper objectHook = (path, map, clazz, adapters) -> {
+    public void testParseUseBeanObjectMapperToNonPublicBean() throws Exception {
+        String s = "{\"name\":\"Java\", \"id\": \"123\"}";
+        JsonReader js = new JsonBuilder().createReader(s);
+        NonPublicBean bean = js.parse(NonPublicBean.class);
+        assertEquals("123", bean.id);
+        assertEquals("Java", bean.name);
+    }
+
+    @Test
+    public void testParseUseCustomObjectMapper() throws Exception {
+        ObjectMapper objectMapper = (path, map, clazz, adapters) -> {
             System.out.println("objectHook -> " + clazz);
             User bean = new User();
             bean.name = (String) map.get("name");
@@ -402,7 +411,7 @@ public class JsonReaderTest {
             return bean;
         };
         String s = "{\"name\":\"Java\", \"version\":1.8, \"draft\":false, \"address\":{ \"street\": \"No.1 West Road\", \"zipcode\": \"100101\"} }";
-        JsonReader js = new JsonBuilder().useObjectHook(objectHook).createReader(s);
+        JsonReader js = new JsonBuilder().useObjectMapper(objectMapper).createReader(s);
         User bean = js.parse(User.class);
         assertEquals("Java", bean.name);
         assertEquals(1.8, bean.version, DELTA);

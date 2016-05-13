@@ -3,6 +3,8 @@ jsonstream
 
 A fast streaming parser for JSON.
 
+[![Build Status](https://travis-ci.org/michaelliao/jsonstream.svg?branch=master)](https://travis-ci.org/michaelliao/jsonstream)
+
 Features:
 
 * Parse or serialize JSON string to/from Java object;

@@ -13,4 +13,4 @@ Features:
 * Customize serialization;
 * Simple API.
 
-Read more at [http://jsonstream.itranswarp.com](http://jsonstream.itranswarp.com)
+Read more at [https://www.liaoxuefeng.com/article/994977272296736](https://www.liaoxuefeng.com/article/994977272296736)

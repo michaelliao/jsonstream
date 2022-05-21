@@ -28,17 +28,16 @@ public class JsonReaderTest {
         return new GsonBuilder().serializeNulls().create().toJson(obj);
     }
 
-    Map<String, Object> prepareOrderedMap(Object ... args) {
+    Map<String, Object> prepareOrderedMap(Object... args) {
         if (args.length % 2 != 0) {
             throw new RuntimeException("Must be key-value pairs.");
         }
         String key = null;
-        Map<String, Object> map = new LinkedHashMap<String, Object>();
+        Map<String, Object> map = new LinkedHashMap<>();
         for (Object o : args) {
             if (key == null) {
                 key = (String) o;
-            }
-            else {
+            } else {
                 map.put(key, o);
                 key = null;
             }
@@ -46,8 +45,8 @@ public class JsonReaderTest {
         return map;
     }
 
-    List<Object> prepareList(Object ... args) {
-        List<Object> list = new ArrayList<Object>();
+    List<Object> prepareList(Object... args) {
+        List<Object> list = new ArrayList<>();
         for (Object o : args) {
             list.add(o);
         }
@@ -66,20 +65,18 @@ public class JsonReaderTest {
 
     @Test
     public void testParseSingleStringFailed() throws Exception {
-        String[] INVALID_STRINGS = {
-                "\"abc\\\"def", // missing end "
+        String[] INVALID_STRINGS = { "\"abc\\\"def", // missing end "
                 "\"abc \\a \"", // invalid \a
                 "\"bb \n   \"", // invalid \n
                 "\"bb \r   \"", // invalid \r
                 "\" \\uF0Fp\"", // invalid unicode: F0Fp
-                "\"  \\\'  \""  // invalid \'
+                "\"  \\\'  \"" // invalid \'
         };
         for (String s : INVALID_STRINGS) {
             try {
                 prepareJsonReader(s).parse();
                 fail("Not caught ParseException: " + s);
-            }
-            catch (JsonParseException e) {
+            } catch (JsonParseException e) {
                 // ok!
             }
         }
@@ -106,13 +103,8 @@ public class JsonReaderTest {
 
     @Test
     public void testParseSingleLongOk() throws Exception {
-        String[] tests = {
-                "0", "00", "000", "-0", "-00",
-                "1", "01", "-1", "-01",
-                "100", "1020", "-100", "-1020",
-                "999000999", "999000999000", "-999000999", "-999000999000",
-                "9007199254740991", "-9007199254740991"
-        };
+        String[] tests = { "0", "00", "000", "-0", "-00", "1", "01", "-1", "-01", "100", "1020", "-100", "-1020", "999000999", "999000999000", "-999000999",
+                "-999000999000", "9007199254740991", "-9007199254740991" };
         for (String s : tests) {
             assertEquals(Long.parseLong(s), ((Long) prepareJsonReader(s).parse()).longValue());
             assertEquals(Long.parseLong(s), ((Long) prepareJsonReader(s + " \r\t\n \n").parse()).longValue());
@@ -123,19 +115,10 @@ public class JsonReaderTest {
 
     @Test
     public void testParseSingleLongFailed() throws Exception {
-        String[] tests = {
-                "0", "00", "000", "-0", "-00",
-                "1", "01", "-1", "-01",
-                "100", "1020", "-100", "-1020",
-                "999000999", "999000999000", "-999000999", "-999000999000",
-                "9007199254740991", "-9007199254740991"
-        };
-        String[] pres = {
-                "", " ", "-", "+", "  }", "  ] ", "\n.", "e"
-        };
-        String[] ends = {
-                "", " ", "-", "+", "  }", "  ] ", "\n.", "e"
-        };
+        String[] tests = { "0", "00", "000", "-0", "-00", "1", "01", "-1", "-01", "100", "1020", "-100", "-1020", "999000999", "999000999000", "-999000999",
+                "-999000999000", "9007199254740991", "-9007199254740991" };
+        String[] pres = { "", " ", "-", "+", "  }", "  ] ", "\n.", "e" };
+        String[] ends = { "", " ", "-", "+", "  }", "  ] ", "\n.", "e" };
         for (String s : tests) {
             for (String pre : pres) {
                 for (String end : ends) {
@@ -145,8 +128,7 @@ public class JsonReaderTest {
                     try {
                         prepareJsonReader(pre + s + end).parse();
                         fail("Not caught JsonParseException when parse: " + pre + s + end + ".");
-                    }
-                    catch (JsonParseException e) {
+                    } catch (JsonParseException e) {
                         // ok
                     }
                 }
@@ -156,17 +138,9 @@ public class JsonReaderTest {
 
     @Test
     public void testParseSingleDouble() throws Exception {
-        String[] tests = {
-                "0.0", "00.0", "0.00", "-00.0", "-0.00",
-                "0.12", "1.01", "-0.12", "-1.01",
-                "12e0", "12e1", "1e01", "12E1", "1E01",
-                "12e+0", "12e+1", "1e+01", "12E+1", "1E+01",
-                "-12e-0","-12e1", "-1e01", "-12E1", "-1E01",
-                "-12e+1", "-1e+01", "-12E+1", "-1E+01",
-                "1.23e12", "1.23e-1", "1.23e-2", "123e-12", "1.23e-12",
-                "-1.23e-1", "-1.23e-2", "-123e-12", "-1.23e-12",
-                "-1.23e+1", "-1.23e+2", "-123e+12", "-1.23e+12"
-        };
+        String[] tests = { "0.0", "00.0", "0.00", "-00.0", "-0.00", "0.12", "1.01", "-0.12", "-1.01", "12e0", "12e1", "1e01", "12E1", "1E01", "12e+0", "12e+1",
+                "1e+01", "12E+1", "1E+01", "-12e-0", "-12e1", "-1e01", "-12E1", "-1E01", "-12e+1", "-1e+01", "-12E+1", "-1E+01", "1.23e12", "1.23e-1",
+                "1.23e-2", "123e-12", "1.23e-12", "-1.23e-1", "-1.23e-2", "-123e-12", "-1.23e-12", "-1.23e+1", "-1.23e+2", "-123e+12", "-1.23e+12" };
         for (String s : tests) {
             assertEquals(Double.parseDouble(s), ((Double) prepareJsonReader(s).parse()).doubleValue(), DELTA);
             assertEquals(Double.parseDouble(s), ((Double) prepareJsonReader(s + " \r\t\n \n").parse()).doubleValue(), DELTA);
@@ -177,23 +151,11 @@ public class JsonReaderTest {
 
     @Test
     public void testParseSingleDoubleFailed() throws Exception {
-        String[] tests = {
-                "0.0", "00.0", "0.00", "-00.0", "-0.00",
-                "0.12", "1.01", "-0.12", "-1.01",
-                "12e0", "12e1", "1e01", "12E1", "1E01",
-                "12e+0", "12e+1", "1e+01", "12E+1", "1E+01",
-                "-12e-0","-12e1", "-1e01", "-12E1", "-1E01",
-                "-12e+1", "-1e+01", "-12E+1", "-1E+01",
-                "1.23e12", "1.23e-1", "1.23e-2", "123e-12", "1.23e-12",
-                "-1.23e-1", "-1.23e-2", "-123e-12", "-1.23e-12",
-                "-1.23e+1", "-1.23e+2", "-123e+12", "-1.23e+12"
-        };
-        String[] pres = {
-                "", " ", "-", "+", "  }", "  ] ", "\n.", "e"
-        };
-        String[] ends = {
-                "", " ", "-", "+", "  }", "  ] ", "\n.", "e"
-        };
+        String[] tests = { "0.0", "00.0", "0.00", "-00.0", "-0.00", "0.12", "1.01", "-0.12", "-1.01", "12e0", "12e1", "1e01", "12E1", "1E01", "12e+0", "12e+1",
+                "1e+01", "12E+1", "1E+01", "-12e-0", "-12e1", "-1e01", "-12E1", "-1E01", "-12e+1", "-1e+01", "-12E+1", "-1E+01", "1.23e12", "1.23e-1",
+                "1.23e-2", "123e-12", "1.23e-12", "-1.23e-1", "-1.23e-2", "-123e-12", "-1.23e-12", "-1.23e+1", "-1.23e+2", "-123e+12", "-1.23e+12" };
+        String[] pres = { "", " ", "-", "+", "  }", "  ] ", "\n.", "e" };
+        String[] ends = { "", " ", "-", "+", "  }", "  ] ", "\n.", "e" };
         for (String s : tests) {
             for (String pre : pres) {
                 for (String end : ends) {
@@ -203,8 +165,7 @@ public class JsonReaderTest {
                     try {
                         prepareJsonReader(pre + s + end).parse();
                         fail("Not caught JsonParseException when parse: " + pre + s + end + ".");
-                    }
-                    catch (JsonParseException e) {
+                    } catch (JsonParseException e) {
                         // ok
                     }
                 }
@@ -214,10 +175,7 @@ public class JsonReaderTest {
 
     @Test
     public void testParseEmptyArrayAndObjectOk() throws Exception {
-        String[] tests = {
-                "[]", "  []", "\n \r[] \t \n", "  \n  []\t \r\r \n",
-                " [ ] ", " [    ] ", "\r \n[\n ]\t \t", " [  \n]\t ", " \n[ \t \n ]\t \n"
-        };
+        String[] tests = { "[]", "  []", "\n \r[] \t \n", "  \n  []\t \r\r \n", " [ ] ", " [    ] ", "\r \n[\n ]\t \t", " [  \n]\t ", " \n[ \t \n ]\t \n" };
         Object[] expecteds = {};
         for (String s : tests) {
             assertArrayEquals(expecteds, ((List<?>) prepareJsonReader(s).parse()).toArray());
@@ -228,14 +186,10 @@ public class JsonReaderTest {
 
     @Test
     public void testParseNonEmptyArrayOk() throws Exception {
-        String[] tests = {
-                "[\"TEST\",true,1,false,2.5,null,\"END\"]",
-                "[ \"TEST\", true, 1, false , 2.5 ,null, \"END\" ]",
-                " [ \"TEST\", \ntrue, 1,\tfalse , 2.5 ,null, \"END\" ] ",
-                "\n[\n  \"TEST\", true, 1, false , 2.5 ,null, \"END\"\r]\n\t",
-                "\r[\t\"TEST\",\n \n \r true,    1,    false \n, 2.5 ,\tnull, \"END\"\n ]\t"
-        };
-        Object[] expecteds = {"TEST", true, 1L, false, 2.5, null, "END"};
+        String[] tests = { "[\"TEST\",true,1,false,2.5,null,\"END\"]", "[ \"TEST\", true, 1, false , 2.5 ,null, \"END\" ]",
+                " [ \"TEST\", \ntrue, 1,\tfalse , 2.5 ,null, \"END\" ] ", "\n[\n  \"TEST\", true, 1, false , 2.5 ,null, \"END\"\r]\n\t",
+                "\r[\t\"TEST\",\n \n \r true,    1,    false \n, 2.5 ,\tnull, \"END\"\n ]\t" };
+        Object[] expecteds = { "TEST", true, 1L, false, 2.5, null, "END" };
         for (String s : tests) {
             assertArrayEquals(expecteds, ((List<?>) prepareJsonReader(s).parse()).toArray());
         }
@@ -243,14 +197,12 @@ public class JsonReaderTest {
 
     @Test
     public void testParseNonEmptyObjectOk() throws Exception {
-        String[] tests = {
-                "{\"TEST\":true,\" num \":1,\"B\":false,\"--float--\":2.5,\"null\":null,\"\":\"END\"}",
+        String[] tests = { "{\"TEST\":true,\" num \":1,\"B\":false,\"--float--\":2.5,\"null\":null,\"\":\"END\"}",
                 "{ \"TEST\": true,\" num \": 1, \"B\" : false ,\"--float--\"\t: 2.5 , \"null\"  : null, \"\":\t \t\"END\" }",
                 " { \"TEST\": \ntrue, \" num \"\r:\n1,\t\"B\"\n:false , \"--float--\": 2.5 ,\n\"null\"\n:null, \"\"\r:\"END\" } ",
                 "\n{\n  \"TEST\": true,\t\" num \":\t 1,\"B\"\n:\n false ,\n\n\"--float--\"\n:\n2.5 ,\"null\"\n:\nnull, \"\"\n:\n\"END\"\r}\n\t",
-                "\r{\t\"TEST\":\n \n \r true,    \n\" num \":1,  \"B\":  false \n, \"--float--\"\r \r:\r2.5 ,\t\"null\" :null ,\n\"\": \"END\"\n }\t"
-        };
-        Object[] expecteds = {"TEST", " num ", "B", "--float--", "null", ""};
+                "\r{\t\"TEST\":\n \n \r true,    \n\" num \":1,  \"B\":  false \n, \"--float--\"\r \r:\r2.5 ,\t\"null\" :null ,\n\"\": \"END\"\n }\t" };
+        Object[] expecteds = { "TEST", " num ", "B", "--float--", "null", "" };
         Arrays.sort(expecteds);
         for (String s : tests) {
             @SuppressWarnings("unchecked")
@@ -266,11 +218,8 @@ public class JsonReaderTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testParseComplexObjectOk() throws Exception {
-        Map<String, Object> map = prepareOrderedMap(
-                "key1", true,
-                "key2", null,
-                "key3", prepareOrderedMap("sub1", 1234, "sub2", "SUB2", "sub3", false),
-                "key4", "-END-");
+        Map<String, Object> map = prepareOrderedMap("key1", true, "key2", null, "key3", prepareOrderedMap("sub1", 1234, "sub2", "SUB2", "sub3", false), "key4",
+                "-END-");
         String src = prepareStandardJson(map);
         Map<String, Object> parsed = (Map<String, Object>) prepareJsonReader(src).parse();
         // check:
@@ -286,14 +235,8 @@ public class JsonReaderTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testParseComplexObjectWithArrayOk() throws Exception {
-        Map<String, Object> map = prepareOrderedMap(
-                "key1", true,
-                "key2", prepareList(12, 34.5, null, "LIST", false),
-                "key3", prepareOrderedMap(
-                        "sub1", prepareList(),
-                        "sub2", "SUB2",
-                        "sub3", prepareList(true)),
-                "key4", "-END-");
+        Map<String, Object> map = prepareOrderedMap("key1", true, "key2", prepareList(12, 34.5, null, "LIST", false), "key3",
+                prepareOrderedMap("sub1", prepareList(), "sub2", "SUB2", "sub3", prepareList(true)), "key4", "-END-");
         String src = prepareStandardJson(map);
         Map<String, Object> parsed = (Map<String, Object>) prepareJsonReader(src).parse();
         // check:
@@ -309,21 +252,8 @@ public class JsonReaderTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testNestedArrayWithObjectOk() throws Exception {
-        List<Object> list = prepareList(
-                prepareList(
-                        1,
-                        2,
-                        prepareList(
-                                3,
-                                4,
-                                prepareList(prepareList()))),
-                prepareList(
-                        prepareList(
-                                prepareList(5, 6))),
-                prepareList(
-                        prepareOrderedMap(),
-                        prepareOrderedMap("array", prepareList(7, 8)),
-                        prepareOrderedMap("array", prepareList(9, prepareList()))));
+        List<Object> list = prepareList(prepareList(1, 2, prepareList(3, 4, prepareList(prepareList()))), prepareList(prepareList(prepareList(5, 6))),
+                prepareList(prepareOrderedMap(), prepareOrderedMap("array", prepareList(7, 8)), prepareOrderedMap("array", prepareList(9, prepareList()))));
         String src = prepareStandardJson(list);
         List<Object> parsed = (List<Object>) prepareJsonReader(src).parse();
         assertEquals(src, prepareStandardJson(parsed));
@@ -331,23 +261,16 @@ public class JsonReaderTest {
 
     @Test()
     public void testParseWithInvalidJson() throws Exception {
-        String[] tests = {
-                " { \"A\": [  \"missing ,\"   ] \"B\": 0 }",
+        String[] tests = { " { \"A\": [  \"missing ,\"   ] \"B\": 0 }",
                 " [ { \"A\":    [ true, true ],  \"B\":  [ null, null, [ \"should be ] but }\" ] ], \"C\":   {}  }  }  ",
-                " { \"A\": [  \"missing end }\"   ]  ",
-                " { \"A\": [  \"missing ,\"   ] \"B\": 0 }",
-                " { \"A\": [  \"missing ,\"  true ]  }",
-                " { \"A\": [  \"missing ,\"  1.2 ]  }",
-                " { \"A\": [  \"missing ,\"  null ]  }",
-                " { \"A\": [  \"should be } but ]\"   ] ] ",
-                " { \"A\": [ \"has extra }\", []] } }   "
-        };
+                " { \"A\": [  \"missing end }\"   ]  ", " { \"A\": [  \"missing ,\"   ] \"B\": 0 }", " { \"A\": [  \"missing ,\"  true ]  }",
+                " { \"A\": [  \"missing ,\"  1.2 ]  }", " { \"A\": [  \"missing ,\"  null ]  }", " { \"A\": [  \"should be } but ]\"   ] ] ",
+                " { \"A\": [ \"has extra }\", []] } }   " };
         for (String s : tests) {
             try {
                 prepareJsonReader(s).parse();
                 fail("Not caught JsonParseException when parse: " + s);
-            }
-            catch (JsonParseException e) {
+            } catch (JsonParseException e) {
                 // ok, and log error message:
                 System.out.println("Parse: " + s);
                 System.out.println("Error: " + e.getMessage());
@@ -368,11 +291,8 @@ public class JsonReaderTest {
     @Test
     public void testParseUseBeanObjectMapper() throws Exception {
         String s = "{\"name\":\"Java\", \"avoidMe\": 999, \"shouldIgnore\": \"no\", \"version\":1.8, \"draft\":false, \"level\": 9, \"role\":\"TEACHER\", "
-                + " \"longList\": [10, 20, 30, 40, 50],  "
-                + " \"rawList\": [true, null, 100, [], \"RAW\"],  "
-                + " \"longArray\": [1, 2, 3, 4, 5],  "
-                + " \"intArray\": [-1, -2, -3, -4, -5],  "
-                + " \"stringArray\": [null, \"@@@\"],  "
+                + " \"longList\": [10, 20, 30, 40, 50],  " + " \"rawList\": [true, null, 100, [], \"RAW\"],  " + " \"longArray\": [1, 2, 3, 4, 5],  "
+                + " \"intArray\": [-1, -2, -3, -4, -5],  " + " \"stringArray\": [null, \"@@@\"],  "
                 + " \"friends\": [ { \"id\": 123, \"name\": \"A1\" }, null, { \"id\": 456, \"name\": \"A2\" }  ],  "
                 + " \"address\":{ \"street\": \"No.1 West Road\", \"zipcode\": \"100101\"} }";
         JsonReader js = new JsonBuilder().createReader(s);
@@ -439,10 +359,12 @@ class User extends AbstractUser {
     String name;
     short level;
     String shouldIgnore = "yes";
+
     @JsonIgnore
     public void setShouldIgnore(String shouldIgnore) {
         this.shouldIgnore = shouldIgnore;
     }
+
     Address address;
     long[] longArray;
     int[] intArray;
@@ -465,7 +387,5 @@ class Friend {
 }
 
 enum Role {
-    ADMIN,
-    TEACHER,
-    STUDENT
+    ADMIN, TEACHER, STUDENT
 }

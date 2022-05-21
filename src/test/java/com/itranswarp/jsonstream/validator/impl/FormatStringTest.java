@@ -6,41 +6,40 @@ import org.junit.Test;
 import com.itranswarp.jsonstream.annotation.Format;
 import com.itranswarp.jsonstream.format.Email;
 import com.itranswarp.jsonstream.format.LowerCase;
-import com.itranswarp.jsonstream.validator.impl.StringValidator;
 import com.itranswarp.jsonstream.JsonValidateException;
 
 public class FormatStringTest {
 
-	StringValidator formatValidator;
-	FormatStringBean bean;
+    StringValidator formatValidator;
+    FormatStringBean bean;
 
-	@Before
-	public void setUp() throws Exception {
-		formatValidator = new StringValidator(FormatStringBean.class.getDeclaredField("emailValue"));
-		bean = new FormatStringBean();
-	}
+    @Before
+    public void setUp() throws Exception {
+        formatValidator = new StringValidator(FormatStringBean.class.getDeclaredField("emailValue"));
+        bean = new FormatStringBean();
+    }
 
     @Test
     public void testEmailIsOk() {
         formatValidator.validate("michael@itranswarp.com", "path", "value");
     }
 
-	@Test(expected=JsonValidateException.class)
+    @Test(expected = JsonValidateException.class)
     public void testEmailIsOkButLowerCaseFailed() {
         formatValidator.validate("Michael@itranswarp.com", "path", "value");
     }
 
-	@Test
-	public void testEmailValueIsNull() {
-	    formatValidator.validate(null, "path", "value");
-	}
+    @Test
+    public void testEmailValueIsNull() {
+        formatValidator.validate(null, "path", "value");
+    }
 
 }
 
 class FormatStringBean {
 
     @Format(Email.class)
-	@Format(LowerCase.class)
-	String emailValue;
+    @Format(LowerCase.class)
+    String emailValue;
 
 }

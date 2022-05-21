@@ -14,15 +14,14 @@ class PropertyGetters {
 
     PropertyGetters(Class<?> clazz) {
         this.clazz = clazz;
-        Map<String, PropertyGetter> map = new HashMap<String, PropertyGetter>();
-        Set<String> ignoredProperties = new HashSet<String>();
+        Map<String, PropertyGetter> map = new HashMap<>();
+        Set<String> ignoredProperties = new HashSet<>();
         Map<String, Method> getters = PropertyUtils.getAllGetters(clazz);
         for (String propertyName : getters.keySet()) {
             Method m = getters.get(propertyName);
-            if (m==null) {
+            if (m == null) {
                 ignoredProperties.add(propertyName);
-            }
-            else {
+            } else {
                 m.setAccessible(true);
                 map.put(propertyName, new PropertyGetter() {
                     public Object getProperty(Object obj) throws Exception {
@@ -33,7 +32,7 @@ class PropertyGetters {
         }
         Map<String, Field> fields = PropertyUtils.getAllFields(clazz);
         for (String propertyName : fields.keySet()) {
-            if (! map.containsKey(propertyName) && ! ignoredProperties.contains(propertyName)) {
+            if (!map.containsKey(propertyName) && !ignoredProperties.contains(propertyName)) {
                 Field f = fields.get(propertyName);
                 f.setAccessible(true);
                 map.put(propertyName, new PropertyGetter() {
@@ -51,9 +50,8 @@ class PropertyGetters {
     }
 
     interface PropertyGetter {
-    
+
         Object getProperty(Object obj) throws Exception;
 
     }
 }
-

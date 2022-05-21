@@ -47,16 +47,16 @@ public class JsonWriterTest {
 
     @Test
     public void testWriteMap() throws Exception {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put("key", 123456);
         JsonWriter jw = prepareJsonWriter();
         jw.write(map);
         assertEquals("{\"key\":123456}", jw.toString());
     }
 
-    @Test(expected=ClassCastException.class)
+    @Test(expected = ClassCastException.class)
     public void testWriteMapButKeyIsInvalid() throws Exception {
-        Map<Object, Object> map = new HashMap<Object, Object>();
+        Map<Object, Object> map = new HashMap<>();
         map.put(123, "456");
         JsonWriter jw = prepareJsonWriter();
         jw.write(map);
@@ -79,34 +79,32 @@ public class JsonWriterTest {
     @Test
     public void testWriteBooleanArray() throws Exception {
         JsonWriter jw = prepareJsonWriter();
-        jw.write(new boolean[] {true, false, true, false});
+        jw.write(new boolean[] { true, false, true, false });
         assertEquals("[true, false, true, false]", jw.toString());
     }
 
     @Test
     public void testWriteIntArray() throws Exception {
         JsonWriter jw = prepareJsonWriter();
-        jw.write(new int[] {1, 2, 3, 4, 5});
+        jw.write(new int[] { 1, 2, 3, 4, 5 });
         assertEquals("[1, 2, 3, 4, 5]", jw.toString());
     }
 
     @Test
     public void testWriteFloatArray() throws Exception {
         JsonWriter jw = prepareJsonWriter();
-        jw.write(new float[] {1.0f, 2.5f, 0.5e10f});
+        jw.write(new float[] { 1.0f, 2.5f, 0.5e10f });
         assertEquals("[1.0, 2.5, 5.0E9]", jw.toString());
     }
 
     @Test
     public void testWriteObjectArray() throws Exception {
         JsonWriter jw = prepareJsonWriter();
-        jw.write(new Object[] {123, null,
-                new int[] {0, -1, -2},
-                true, 2.5, new short[0]});
+        jw.write(new Object[] { 123, null, new int[] { 0, -1, -2 }, true, 2.5, new short[0] });
         assertEquals("[123,null,[0, -1, -2],true,2.5,[]]", jw.toString());
     }
 
-    @Test(expected=JsonSerializeException.class)
+    @Test(expected = JsonSerializeException.class)
     public void testWriteNestedArrayWithOutOfMaxDepth() throws Exception {
         JsonWriter jw = prepareJsonWriter();
         Object[] array1 = new Object[] { "nested", null };
@@ -163,10 +161,12 @@ class Bean {
     Nested sub = new Nested();
 
     String password = "******";
+
     @JsonIgnore
     public String getPassword() {
         return this.password;
     }
+
     public void setPassword(String password) {
         this.password = password;
     }

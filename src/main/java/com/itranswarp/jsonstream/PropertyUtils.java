@@ -18,16 +18,11 @@ class PropertyUtils {
      */
     private static String getGetterName(Method m) {
         String name = m.getName();
-        if (name.startsWith("get") && (name.length() >= 4)
-                && ! m.getReturnType().equals(void.class)
-                && (m.getParameterTypes().length == 0)
-        ) {
+        if (name.startsWith("get") && (name.length() >= 4) && !m.getReturnType().equals(void.class) && (m.getParameterTypes().length == 0)) {
             return Character.toLowerCase(name.charAt(3)) + name.substring(4);
         }
-        if (name.startsWith("is") && (name.length() >= 3)
-                && (m.getReturnType().equals(boolean.class) || m.getReturnType().equals(Boolean.class))
-                && (m.getParameterTypes().length == 0)
-        ) {
+        if (name.startsWith("is") && (name.length() >= 3) && (m.getReturnType().equals(boolean.class) || m.getReturnType().equals(Boolean.class))
+                && (m.getParameterTypes().length == 0)) {
             return Character.toLowerCase(name.charAt(2)) + name.substring(3);
         }
         return null;
@@ -41,24 +36,21 @@ class PropertyUtils {
      */
     private static String getSetterName(Method m) {
         String name = m.getName();
-        if (name.startsWith("set") && (name.length() >= 4)
-                && m.getReturnType().equals(void.class)
-                && (m.getParameterTypes().length == 1)
-        ) {
+        if (name.startsWith("set") && (name.length() >= 4) && m.getReturnType().equals(void.class) && (m.getParameterTypes().length == 1)) {
             return Character.toLowerCase(name.charAt(3)) + name.substring(4);
         }
         return null;
     }
 
     /**
-     * Get all getters of this class, includes inherited methods, but excludes 
+     * Get all getters of this class, includes inherited methods, but excludes
      * static methods. Methods marked as @JsonIgnore are put to as null.
      * 
      * @param clazz
      * @return
      */
     static Map<String, Method> getAllGetters(Class<?> clazz) {
-        Map<String, Method> methods = new HashMap<String, Method>();
+        Map<String, Method> methods = new HashMap<>();
         while (!clazz.equals(Object.class)) {
             for (Method m : clazz.getDeclaredMethods()) {
                 if (Modifier.isStatic(m.getModifiers())) {
@@ -68,7 +60,7 @@ class PropertyUtils {
                 if (shouldIgnore(m)) {
                     methods.put(propertyName, null);
                 }
-                if (propertyName!=null && !methods.containsKey(propertyName)) {
+                if (propertyName != null && !methods.containsKey(propertyName)) {
                     methods.put(propertyName, m);
                 }
             }
@@ -78,14 +70,14 @@ class PropertyUtils {
     }
 
     /**
-     * Get all setters of this class, includes inherited methods, but excludes 
+     * Get all setters of this class, includes inherited methods, but excludes
      * static methods. Methods marked as @JsonIgnore are put to as null.
      * 
      * @param clazz
      * @return
      */
     static Map<String, Method> getAllSetters(Class<?> clazz) {
-        Map<String, Method> methods = new HashMap<String, Method>();
+        Map<String, Method> methods = new HashMap<>();
         while (!clazz.equals(Object.class)) {
             for (Method m : clazz.getDeclaredMethods()) {
                 if (Modifier.isStatic(m.getModifiers())) {
@@ -95,7 +87,7 @@ class PropertyUtils {
                 if (shouldIgnore(m)) {
                     methods.put(propertyName, null);
                 }
-                if (propertyName!=null && !methods.containsKey(propertyName)) {
+                if (propertyName != null && !methods.containsKey(propertyName)) {
                     methods.put(propertyName, m);
                 }
             }
@@ -105,13 +97,13 @@ class PropertyUtils {
     }
 
     static Map<String, Field> getAllFields(Class<?> clazz) {
-        Map<String, Field> fields = new HashMap<String, Field>();
+        Map<String, Field> fields = new HashMap<>();
         while (!clazz.equals(Object.class)) {
             for (Field f : clazz.getDeclaredFields()) {
                 if (Modifier.isStatic(f.getModifiers()) || shouldIgnore(f)) {
                     continue;
                 }
-                if (! fields.containsKey(f.getName())) {
+                if (!fields.containsKey(f.getName())) {
                     fields.put(f.getName(), f);
                 }
             }

@@ -22,17 +22,16 @@ public class JsonReaderToAbstractBeanTest {
         return new GsonBuilder().serializeNulls().create().toJson(obj);
     }
 
-    Map<String, Object> prepareOrderedMap(Object ... args) {
+    Map<String, Object> prepareOrderedMap(Object... args) {
         if (args.length % 2 != 0) {
             throw new RuntimeException("Must be key-value pairs.");
         }
         String key = null;
-        Map<String, Object> map = new LinkedHashMap<String, Object>();
+        Map<String, Object> map = new LinkedHashMap<>();
         for (Object o : args) {
             if (key == null) {
                 key = (String) o;
-            }
-            else {
+            } else {
                 map.put(key, o);
                 key = null;
             }
@@ -40,8 +39,8 @@ public class JsonReaderToAbstractBeanTest {
         return map;
     }
 
-    List<Object> prepareList(Object ... args) {
-        List<Object> list = new ArrayList<Object>();
+    List<Object> prepareList(Object... args) {
+        List<Object> list = new ArrayList<>();
         for (Object o : args) {
             list.add(o);
         }
@@ -50,10 +49,8 @@ public class JsonReaderToAbstractBeanTest {
 
     @Test
     public void testParseUseBeanObjectHook() throws Exception {
-        String s = "{\"name\":\"Bob\", \"dogs\": ["
-                + "   {\"type\": \"Husky\", \"name\": \"Haha\", \"age\": 3, \"clever\": 50 }, "
-                + "   {\"type\": \"Bulldog\", \"name\": \"Blue\", \"age\": 2, \"weight\": 12 } "
-                + " ] }";
+        String s = "{\"name\":\"Bob\", \"dogs\": [" + "   {\"type\": \"Husky\", \"name\": \"Haha\", \"age\": 3, \"clever\": 50 }, "
+                + "   {\"type\": \"Bulldog\", \"name\": \"Blue\", \"age\": 2, \"weight\": 12 } " + " ] }";
         ObjectTypeFinder typeFinder = (clazz, jsonObject) -> {
             if (AbstractDog.class.equals(clazz)) {
                 Object value = jsonObject.get("type");

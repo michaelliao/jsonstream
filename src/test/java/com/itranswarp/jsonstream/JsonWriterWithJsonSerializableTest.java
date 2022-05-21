@@ -10,7 +10,7 @@ import org.junit.Test;
 public class JsonWriterWithJsonSerializableTest {
 
     String object2Json(Object obj) throws Exception {
-        JsonWriter jsonWriter =  new JsonBuilder().createWriter();
+        JsonWriter jsonWriter = new JsonBuilder().createWriter();
         jsonWriter.write(obj);
         return jsonWriter.toString();
     }
@@ -43,7 +43,7 @@ class Student2 implements JsonSerializable {
 
     @Override
     public Map<String, Object> toJson() {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put("student", this.name);
         map.put("grade", getGrade());
         return map;

@@ -32,15 +32,14 @@ class PropertySetters {
 
     PropertySetters(Class<?> clazz) {
         this.clazz = clazz;
-        Map<String, PropertySetter> map = new HashMap<String, PropertySetter>();
-        Set<String> ignoredProperties = new HashSet<String>();
+        Map<String, PropertySetter> map = new HashMap<>();
+        Set<String> ignoredProperties = new HashSet<>();
         Map<String, Method> setters = PropertyUtils.getAllSetters(clazz);
         for (String propertyName : setters.keySet()) {
             Method m = setters.get(propertyName);
-            if (m==null) {
+            if (m == null) {
                 ignoredProperties.add(propertyName);
-            }
-            else {
+            } else {
                 m.setAccessible(true);
                 Type type = m.getGenericParameterTypes()[0];
                 Class<?> propertyType = getRawType(type);
@@ -51,15 +50,19 @@ class PropertySetters {
                     public boolean isRequired() {
                         return isRequired;
                     }
+
                     public Class<?> getPropertyType() {
                         return propertyType;
                     }
+
                     public Class<?> getGenericType() {
                         return genericType;
                     }
+
                     public void setProperty(Object bean, Object value) throws Exception {
                         m.invoke(bean, value);
                     }
+
                     public Validator<?>[] getValidators() {
                         return validators;
                     }
@@ -68,7 +71,7 @@ class PropertySetters {
         }
         Map<String, Field> fields = PropertyUtils.getAllFields(clazz);
         for (String propertyName : fields.keySet()) {
-            if (! map.containsKey(propertyName) && ! ignoredProperties.contains(propertyName)) {
+            if (!map.containsKey(propertyName) && !ignoredProperties.contains(propertyName)) {
                 Field f = fields.get(propertyName);
                 f.setAccessible(true);
                 Type type = f.getGenericType();
@@ -80,15 +83,19 @@ class PropertySetters {
                     public boolean isRequired() {
                         return isRequired;
                     }
+
                     public Class<?> getPropertyType() {
                         return propertyType;
                     }
+
                     public Class<?> getGenericType() {
                         return genericType;
                     }
+
                     public void setProperty(Object bean, Object value) throws Exception {
                         f.set(bean, value);
                     }
+
                     public Validator<?>[] getValidators() {
                         return validators;
                     }
@@ -142,7 +149,7 @@ class PropertySetters {
     }
 
     /**
-     * Get generic type of property, e.g. generic type of List<String> is String. 
+     * Get generic type of property, e.g. generic type of List<String> is String.
      * Return Class<Object> if no generic type.
      */
     Class<?> getGenericType(Type type) {

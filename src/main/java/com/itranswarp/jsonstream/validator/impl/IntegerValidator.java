@@ -18,79 +18,75 @@ import com.itranswarp.jsonstream.validator.Validator;
  * An IntegerValidator accepts the following annotations:
  * 
  * <ul>
- *   <li>@Required</li>
- *   <li>@MultipleOf</li>
- *   <li>@MinimumInteger</li>
- *   <li>@MaximumInteger</li>
- *   <li>@ExclusiveMinimum</li>
- *   <li>@ExclusiveMaximum</li>
- *   <li>@EnumInteger</li>
+ * <li>@Required</li>
+ * <li>@MultipleOf</li>
+ * <li>@MinimumInteger</li>
+ * <li>@MaximumInteger</li>
+ * <li>@ExclusiveMinimum</li>
+ * <li>@ExclusiveMaximum</li>
+ * <li>@EnumInteger</li>
  * </ul>
  * 
  * @author Michael Liao
  */
 public class IntegerValidator implements Validator<Long> {
 
-	final boolean required;
-	final Long multipleOf;
-	final Long minimum;
-	final Long maximum;
-	final boolean exclusiveMinimum;
-	final boolean exclusiveMaximum;
-	final Set<Long> enums;
+    final boolean required;
+    final Long multipleOf;
+    final Long minimum;
+    final Long maximum;
+    final boolean exclusiveMinimum;
+    final boolean exclusiveMaximum;
+    final Set<Long> enums;
 
-	public IntegerValidator(AnnotatedElement ae) {
-		required = ae.isAnnotationPresent(Required.class);
-		multipleOf = ae.isAnnotationPresent(MultipleOf.class)
-		        ? ae.getAnnotation(MultipleOf.class).value() : null;
-		minimum = ae.isAnnotationPresent(MinimumInteger.class)
-		        ? ae.getAnnotation(MinimumInteger.class).value() : null;
-		maximum = ae.isAnnotationPresent(MaximumInteger.class)
-		        ? ae.getAnnotation(MaximumInteger.class).value() : null;
-		exclusiveMinimum = ae.isAnnotationPresent(ExclusiveMinimum.class);
-		exclusiveMaximum = ae.isAnnotationPresent(ExclusiveMaximum.class);
-		if (ae.isAnnotationPresent(EnumInteger.class)) {
-			enums = new HashSet<Long>();
-			for (long en : ae.getAnnotation(EnumInteger.class).value()) {
-				enums.add(en);
-			}
-		}
-		else {
-			enums = null;
-		}
-	}
+    public IntegerValidator(AnnotatedElement ae) {
+        required = ae.isAnnotationPresent(Required.class);
+        multipleOf = ae.isAnnotationPresent(MultipleOf.class) ? ae.getAnnotation(MultipleOf.class).value() : null;
+        minimum = ae.isAnnotationPresent(MinimumInteger.class) ? ae.getAnnotation(MinimumInteger.class).value() : null;
+        maximum = ae.isAnnotationPresent(MaximumInteger.class) ? ae.getAnnotation(MaximumInteger.class).value() : null;
+        exclusiveMinimum = ae.isAnnotationPresent(ExclusiveMinimum.class);
+        exclusiveMaximum = ae.isAnnotationPresent(ExclusiveMaximum.class);
+        if (ae.isAnnotationPresent(EnumInteger.class)) {
+            enums = new HashSet<>();
+            for (long en : ae.getAnnotation(EnumInteger.class).value()) {
+                enums.add(en);
+            }
+        } else {
+            enums = null;
+        }
+    }
 
-	public void validate(Long obj, String path, String name) {
-		String fullpath = path + "." + name;
-		if (required && obj == null) {
-			throw new JsonValidateException("Required", fullpath);
-		}
-		if (obj == null) {
-			return;
-		}
-		long value = obj.longValue();
-		if ((multipleOf != null) && (value % multipleOf > 0)) {
-			throw new JsonValidateException("MultipleOf", fullpath);
-		}
-		if (minimum != null) {
-			if (value < minimum) {
-				throw new JsonValidateException("Minimum", fullpath);
-			}
-			if (exclusiveMinimum && (value == minimum)) {
-				throw new JsonValidateException("ExclusiveMinimum", fullpath);
-			}
-		}
-		if (maximum != null) {
-			if (value > maximum) {
-				throw new JsonValidateException("Maximum", fullpath);
-			}
-			if (exclusiveMaximum && (value == maximum)) {
-				throw new JsonValidateException("ExclusiveMaximum", fullpath);
-			}
-		}
-		if (enums != null && !enums.contains(obj)) {
-			throw new JsonValidateException("Enum", fullpath);
-		}
-	}
+    public void validate(Long obj, String path, String name) {
+        String fullpath = path + "." + name;
+        if (required && obj == null) {
+            throw new JsonValidateException("Required", fullpath);
+        }
+        if (obj == null) {
+            return;
+        }
+        long value = obj.longValue();
+        if ((multipleOf != null) && (value % multipleOf > 0)) {
+            throw new JsonValidateException("MultipleOf", fullpath);
+        }
+        if (minimum != null) {
+            if (value < minimum) {
+                throw new JsonValidateException("Minimum", fullpath);
+            }
+            if (exclusiveMinimum && (value == minimum)) {
+                throw new JsonValidateException("ExclusiveMinimum", fullpath);
+            }
+        }
+        if (maximum != null) {
+            if (value > maximum) {
+                throw new JsonValidateException("Maximum", fullpath);
+            }
+            if (exclusiveMaximum && (value == maximum)) {
+                throw new JsonValidateException("ExclusiveMaximum", fullpath);
+            }
+        }
+        if (enums != null && !enums.contains(obj)) {
+            throw new JsonValidateException("Enum", fullpath);
+        }
+    }
 
 }

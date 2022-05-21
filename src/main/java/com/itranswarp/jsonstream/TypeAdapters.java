@@ -10,7 +10,7 @@ import java.util.Map;
  */
 class TypeAdapters {
 
-    Map<String, TypeAdapter<?>> adapters = new HashMap<String, TypeAdapter<?>>();
+    Map<String, TypeAdapter<?>> adapters = new HashMap<>();
 
     public <T> void registerTypeAdapter(Class<T> clazz, TypeAdapter<T> typeAdapter) {
         adapters.put(clazz.getName(), typeAdapter);

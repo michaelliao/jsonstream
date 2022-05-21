@@ -16,7 +16,7 @@ public class JsonWriter {
 
     final boolean canToString;
     final Writer writer;
-    final Map<String, PropertyGetters> cachedGetters = new ConcurrentHashMap<String, PropertyGetters>();
+    final Map<String, PropertyGetters> cachedGetters = new ConcurrentHashMap<>();
     final TypeAdapters typeAdapters;
 
     public JsonWriter(TypeAdapters typeAdapters) {
@@ -35,8 +35,7 @@ public class JsonWriter {
     public String toString() {
         if (this.canToString) {
             return writer.toString();
-        }
-        else {
+        } else {
             throw new RuntimeException("Cannot get String since this JsonWriter write to an external stream.");
         }
     }
@@ -63,7 +62,7 @@ public class JsonWriter {
             return;
         }
         writer.write('\"');
-        for (int i = 0; i < s.length(); i ++) {
+        for (int i = 0; i < s.length(); i++) {
             char ch = s.charAt(i);
             switch (ch) {
             case '\"':
@@ -114,36 +113,28 @@ public class JsonWriter {
         for (Object t : list) {
             if (isFirst) {
                 isFirst = false;
-            }
-            else {
+            } else {
                 writer.write(',');
             }
             if (t == null) {
                 writeNull();
-            }
-            else if (t instanceof Number) {
+            } else if (t instanceof Number) {
                 writeNumber((Number) t);
-            }
-            else if (t instanceof Boolean) {
+            } else if (t instanceof Boolean) {
                 writeBoolean((Boolean) t);
-            }
-            else if (t instanceof String) {
+            } else if (t instanceof String) {
                 writeString((String) t);
-            }
-            else if (t instanceof List) {
+            } else if (t instanceof List) {
                 @SuppressWarnings("unchecked")
                 List<Object> l = (List<Object>) t;
                 writeList(l, typeAdapters, depth + 1);
-            }
-            else if (t instanceof Map) {
+            } else if (t instanceof Map) {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> m = (Map<String, Object>) t;
                 writeMap(m, typeAdapters, depth + 1);
-            }
-            else if (t.getClass().isArray()) {
+            } else if (t.getClass().isArray()) {
                 writeArray(t, typeAdapters, depth + 1);
-            }
-            else {
+            } else {
                 writeObject(t, typeAdapters, depth + 1);
             }
         }
@@ -156,26 +147,19 @@ public class JsonWriter {
         }
         if (array instanceof boolean[]) {
             writer.write(Arrays.toString((boolean[]) array));
-        }
-        else if (array instanceof int[]) {
+        } else if (array instanceof int[]) {
             writer.write(Arrays.toString((int[]) array));
-        }
-        else if (array instanceof long[]) {
+        } else if (array instanceof long[]) {
             writer.write(Arrays.toString((long[]) array));
-        }
-        else if (array instanceof float[]) {
+        } else if (array instanceof float[]) {
             writer.write(Arrays.toString((float[]) array));
-        }
-        else if (array instanceof double[]) {
+        } else if (array instanceof double[]) {
             writer.write(Arrays.toString((double[]) array));
-        }
-        else if (array instanceof short[]) {
+        } else if (array instanceof short[]) {
             writer.write(Arrays.toString((short[]) array));
-        }
-        else if (array instanceof byte[]) {
+        } else if (array instanceof byte[]) {
             writer.write(Arrays.toString((byte[]) array));
-        }
-        else {
+        } else {
             writeList(Arrays.asList((Object[]) array), typeAdapters, depth);
         }
     }
@@ -198,8 +182,7 @@ public class JsonWriter {
             Object propertyValue = map.get(propertyName);
             if (isFirst) {
                 isFirst = false;
-            }
-            else {
+            } else {
                 writer.write(',');
             }
             writer.write('\"');
@@ -246,8 +229,7 @@ public class JsonWriter {
             for (String propertyName : getters.keySet()) {
                 if (isFirst) {
                     isFirst = false;
-                }
-                else {
+                } else {
                     writer.write(',');
                 }
                 PropertyGetter pg = getters.get(propertyName);
@@ -258,11 +240,9 @@ public class JsonWriter {
                 write(obj, depth);
             }
             writer.write('}');
-        }
-        catch (RuntimeException | IOException e) {
+        } catch (RuntimeException | IOException e) {
             throw e;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

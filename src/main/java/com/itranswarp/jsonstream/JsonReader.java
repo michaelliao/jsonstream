@@ -19,22 +19,20 @@ public class JsonReader {
     final ObjectMapper objectHook;
     final TypeAdapters typeAdapters;
 
-    public JsonReader(Reader reader, JsonObjectFactory jsonObjectFactory,
-            JsonArrayFactory jsonArrayFactory, ObjectMapper objectHook, TypeAdapters typeAdapters) {
+    public JsonReader(Reader reader, JsonObjectFactory jsonObjectFactory, JsonArrayFactory jsonArrayFactory, ObjectMapper objectHook,
+            TypeAdapters typeAdapters) {
         this.reader = new TokenReader(new CharReader(reader));
-        this.jsonObjectFactory = jsonObjectFactory != null ? jsonObjectFactory
-                : () -> {
-                    return new HashMap<String, Object>();
-                };
-        this.jsonArrayFactory = jsonArrayFactory != null ? jsonArrayFactory
-                : () -> {
-                    return new ArrayList<Object>();
-                };
+        this.jsonObjectFactory = jsonObjectFactory != null ? jsonObjectFactory : () -> {
+            return new HashMap<>();
+        };
+        this.jsonArrayFactory = jsonArrayFactory != null ? jsonArrayFactory : () -> {
+            return new ArrayList<>();
+        };
         this.objectHook = objectHook;
         this.typeAdapters = typeAdapters;
     }
 
-	boolean hasStatus(int expectedStatus) {
+    boolean hasStatus(int expectedStatus) {
         return ((status & expectedStatus) > 0);
     }
 
@@ -42,7 +40,7 @@ public class JsonReader {
         if (clazz.isInstance(obj)) {
             return obj;
         }
-        if (obj==null && clazz==Object.class) {
+        if (obj == null && clazz == Object.class) {
             return null;
         }
         throw new ClassCastException("Cannot case parsed result from: " + obj.getClass().getName() + " to expected type: " + clazz.getName());
@@ -258,63 +256,66 @@ public class JsonReader {
                     continue;
                 }
                 throw new JsonParseException("Unexpected char: \'{\'.", reader.reader.readed);
-        	}
+
+            default:
+                throw new RuntimeException("Unexpected switch case.");
+            }
         }
-	}
+    }
 
     /**
      * Should read EOF for next token.
      */
-    static final int STATUS_EXPECT_END_DOCUMENT   = 0x0002;
+    static final int STATUS_EXPECT_END_DOCUMENT = 0x0002;
 
     /**
      * Should read "{" for next token.
      */
-    static final int STATUS_EXPECT_BEGIN_OBJECT   = 0x0004;
+    static final int STATUS_EXPECT_BEGIN_OBJECT = 0x0004;
 
     /**
      * Should read "}" for next token.
      */
-    static final int STATUS_EXPECT_END_OBJECT     = 0x0008;
+    static final int STATUS_EXPECT_END_OBJECT = 0x0008;
 
     /**
      * Should read object key for next token.
      */
-    static final int STATUS_EXPECT_OBJECT_KEY     = 0x0010;
+    static final int STATUS_EXPECT_OBJECT_KEY = 0x0010;
 
     /**
      * Should read object value for next token.
      */
-    static final int STATUS_EXPECT_OBJECT_VALUE   = 0x0020;
+    static final int STATUS_EXPECT_OBJECT_VALUE = 0x0020;
 
     /**
      * Should read ":" for next token.
      */
-    static final int STATUS_EXPECT_COLON          = 0x0040;
+    static final int STATUS_EXPECT_COLON = 0x0040;
 
     /**
      * Should read "," for next token.
      */
-    static final int STATUS_EXPECT_COMMA          = 0x0080;
+    static final int STATUS_EXPECT_COMMA = 0x0080;
 
     /**
      * Should read "[" for next token.
      */
-    static final int STATUS_EXPECT_BEGIN_ARRAY    = 0x0100;
+    static final int STATUS_EXPECT_BEGIN_ARRAY = 0x0100;
 
     /**
      * Should read "]" for next token.
      */
-    static final int STATUS_EXPECT_END_ARRAY      = 0x0200;
+    static final int STATUS_EXPECT_END_ARRAY = 0x0200;
 
     /**
      * Should read array value for next token.
      */
-    static final int STATUS_EXPECT_ARRAY_VALUE    = 0x0400;
+    static final int STATUS_EXPECT_ARRAY_VALUE = 0x0400;
 
     /**
      * Should read a single value for next token (must not be "{" or "[").
      */
-    static final int STATUS_EXPECT_SINGLE_VALUE   = 0x0800;
+    static final int STATUS_EXPECT_SINGLE_VALUE = 0x0800;
 
 }

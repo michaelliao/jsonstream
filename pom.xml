@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.itranswarp</groupId>
 	<artifactId>jsonstream</artifactId>
-	<version>1.0.4</version>
+	<version>1.0.5</version>
 	<packaging>jar</packaging>
 
 	<name>jsonstream</name>
@@ -23,8 +22,8 @@
 		<developer>
 			<name>Michael Liao</name>
 			<email>askxuefeng@gmail.com</email>
-			<organization>iTranswarp</organization>
-			<organizationUrl>http://jsonstream.itranswarp.com</organizationUrl>
+			<organization>liaoxuefeng.com</organization>
+			<organizationUrl>https://www.liaoxuefeng.com</organizationUrl>
 		</developer>
 	</developers>
 
@@ -49,13 +48,16 @@
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
-			<version>2.3.1</version>
+			<version>2.9.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
+		<java.version>11</java.version>
 	</properties>
 
 	<build>
@@ -63,18 +65,13 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.2</version>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-					<compilerArgument>-verbose</compilerArgument>
 					<compilerArgument>-parameters</compilerArgument>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>2.2.1</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -87,7 +84,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.9.1</version>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>

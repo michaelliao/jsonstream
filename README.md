@@ -3,7 +3,7 @@ jsonstream
 
 A fast streaming parser for JSON.
 
-[![Build Status](https://travis-ci.org/michaelliao/jsonstream.svg?branch=master)](https://travis-ci.org/michaelliao/jsonstream)
+![Github Workflow](https://github.com/michaelliao/jsonstream/actions/workflows/maven.yml/badge.svg)
 
 Features:
 
